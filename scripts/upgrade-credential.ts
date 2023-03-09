@@ -1,8 +1,9 @@
 import { ethers, upgrades } from "hardhat";
 
-// The address where the contract was deployed
+// The address where the contract was deployed (proxy)
 const credentialAddress = "0x...";
 
+// Note: only the constructor arguments are needed. To change initialized variables, a reinitializer function is needed.
 // ORACLE CONFIG (default: Goerli)
 // const chainlinkToken = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
 // const oracleAddress = "0x188b71C9d27cDeE01B9b0dfF5C1aff62E8D6F434";
