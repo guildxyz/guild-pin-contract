@@ -13,7 +13,8 @@ const oracleFee = ethers.utils.parseEther("0.05");
 async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
   const guildCredential = await upgrades.upgradeProxy(credentialAddress, GuildCredential, {
-    constructorArgs: [jobId, oracleFee]
+    constructorArgs: [jobId, oracleFee],
+    kind: "uups"
   });
 
   console.log(

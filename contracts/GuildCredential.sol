@@ -3,11 +3,20 @@ pragma solidity 0.8.19;
 
 import { GuildOracle } from "./GuildOracle.sol";
 import { IGuildCredential } from "./interfaces/IGuildCredential.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 /// @title An NFT representing actions taken by Guild.xyz users.
-contract GuildCredential is IGuildCredential, Initializable, GuildOracle, ERC721Upgradeable {
+contract GuildCredential is
+    IGuildCredential,
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    GuildOracle,
+    ERC721Upgradeable
+{
     uint256 public totalSupply;
 
     /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
@@ -37,8 +46,13 @@ contract GuildCredential is IGuildCredential, Initializable, GuildOracle, ERC721
         address linkToken,
         address oracleAddress
     ) public initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
         __GuildOracle_init(linkToken, oracleAddress);
         __ERC721_init(name, symbol);
         cid = cid_;
     }
+
+    // solhint-disable-next-line no-empty-blocks
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

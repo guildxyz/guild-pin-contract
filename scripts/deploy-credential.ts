@@ -16,7 +16,7 @@ async function main() {
   const guildCredential = await upgrades.deployProxy(
     GuildCredential,
     [name, symbol, cid, chainlinkToken, oracleAddress],
-    { constructorArgs: [jobId, oracleFee] }
+    { constructorArgs: [jobId, oracleFee], kind: "uups" }
   );
 
   console.log(

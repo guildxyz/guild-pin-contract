@@ -21,7 +21,8 @@ describe("GuildCredential", () => {
   beforeEach("deploy contract", async () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
     credential = await upgrades.deployProxy(GuildCredential, [name, symbol, cid, chainlinkToken, oracleAddress], {
-      constructorArgs: [jobId, oracleFee]
+      constructorArgs: [jobId, oracleFee],
+      kind: "uups"
     });
     await credential.deployed();
   });
@@ -34,7 +35,8 @@ describe("GuildCredential", () => {
 
   it("should be upgradeable", async () => {
     const upgraded = await upgrades.upgradeProxy(credential.address, GuildCredential, {
-      constructorArgs: [jobId, oracleFee]
+      constructorArgs: [jobId, oracleFee],
+      kind: "uups"
     });
 
     console.log(credential.address, upgraded.address);
