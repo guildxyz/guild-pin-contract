@@ -3,10 +3,10 @@ pragma solidity 0.8.19;
 
 import { GuildOracle } from "./GuildOracle.sol";
 import { IGuildCredential } from "./interfaces/IGuildCredential.sol";
+import { SoulboundERC721 } from "./token/SoulboundERC721.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 /// @title An NFT representing actions taken by Guild.xyz users.
 contract GuildCredential is
@@ -15,7 +15,7 @@ contract GuildCredential is
     OwnableUpgradeable,
     UUPSUpgradeable,
     GuildOracle,
-    ERC721Upgradeable
+    SoulboundERC721
 {
     uint256 public totalSupply;
 
@@ -49,7 +49,7 @@ contract GuildCredential is
         __Ownable_init();
         __UUPSUpgradeable_init();
         __GuildOracle_init(linkToken, oracleAddress);
-        __ERC721_init(name, symbol);
+        __SoulboundERC721_init(name, symbol);
         cid = cid_;
     }
 

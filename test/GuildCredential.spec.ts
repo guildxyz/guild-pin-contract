@@ -1,5 +1,6 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { Contract, ContractFactory } from "ethers";
+import { constants, Contract, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 
 // NFT METADATA
@@ -17,7 +18,15 @@ const oracleFee = ethers.utils.parseEther("0.05");
 let GuildCredential: ContractFactory;
 let credential: Contract;
 
+// Test accounts
+let wallet0: SignerWithAddress;
+let randomWallet: SignerWithAddress;
+
 describe("GuildCredential", () => {
+  before("get accounts", async () => {
+    [wallet0, randomWallet] = await ethers.getSigners();
+  });
+
   beforeEach("deploy contract", async () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
     credential = await upgrades.deployProxy(GuildCredential, [name, symbol, cid, chainlinkToken, oracleAddress], {
@@ -39,9 +48,35 @@ describe("GuildCredential", () => {
       kind: "uups"
     });
 
-    console.log(credential.address, upgraded.address);
     expect(await upgraded.name()).to.eq(name);
     expect(await upgraded.symbol()).to.eq(symbol);
     // expect(await upgraded.tokenUri()).to.contain(cid);
+  });
+
+  it("should be soulbound", async () => {
+    await expect(credential.approve(wallet0.address, 0)).to.be.revertedWithCustomError(GuildCredential, "Soulbound");
+    await expect(credential.setApprovalForAll(wallet0.address, true)).to.be.revertedWithCustomError(
+      GuildCredential,
+      "Soulbound"
+    );
+    await expect(credential.isApprovedForAll(wallet0.address, randomWallet.address)).to.be.revertedWithCustomError(
+      GuildCredential,
+      "Soulbound"
+    );
+    await expect(credential.transferFrom(wallet0.address, randomWallet.address, 0)).to.be.revertedWithCustomError(
+      GuildCredential,
+      "Soulbound"
+    );
+    await expect(
+      credential["safeTransferFrom(address,address,uint256)"](wallet0.address, randomWallet.address, 0)
+    ).to.be.revertedWithCustomError(GuildCredential, "Soulbound");
+    await expect(
+      credential["safeTransferFrom(address,address,uint256,bytes)"](
+        wallet0.address,
+        randomWallet.address,
+        0,
+        constants.HashZero
+      )
+    ).to.be.revertedWithCustomError(GuildCredential, "Soulbound");
   });
 });

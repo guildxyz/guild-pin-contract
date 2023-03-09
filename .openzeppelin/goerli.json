@@ -352,6 +352,351 @@
           }
         }
       }
+    },
+    "2979baa0a4a1c038a449046dd7ac34d948de1a7fdef3bbdfcbdbc8ce23c32309": {
+      "address": "0x0d72BCDA1Ec6D0E195249519fb83BB5D559E895D",
+      "txHash": "0xe84ab81f788cc09b148f3ed32d47bfca07f534622bdb1c9c3c3fcff169d728b8",
+      "layout": {
+        "solcVersion": "0.8.19",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "s_ens",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_contract(ENSInterface)973",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:29"
+          },
+          {
+            "label": "s_ensNode",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_bytes32",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:30"
+          },
+          {
+            "label": "s_link",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_contract(LinkTokenInterface)1068",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:31"
+          },
+          {
+            "label": "s_oracle",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_contract(OperatorInterface)1148",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:32"
+          },
+          {
+            "label": "s_requestCount",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_uint256",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:33"
+          },
+          {
+            "label": "s_pendingRequests",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_mapping(t_bytes32,t_address)",
+            "contract": "ChainlinkClient",
+            "src": "@chainlink/contracts/src/v0.8/ChainlinkClient.sol:34"
+          },
+          {
+            "label": "requests",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_mapping(t_bytes32,t_struct(RequestParams)5733_storage)",
+            "contract": "GuildOracle",
+            "src": "contracts/GuildOracle.sol:32"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_array(t_uint256)47_storage",
+            "contract": "GuildOracle",
+            "src": "contracts/GuildOracle.sol:43"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "255",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "_name",
+            "offset": 0,
+            "slot": "305",
+            "type": "t_string_storage",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:25"
+          },
+          {
+            "label": "_symbol",
+            "offset": 0,
+            "slot": "306",
+            "type": "t_string_storage",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:28"
+          },
+          {
+            "label": "_owners",
+            "offset": 0,
+            "slot": "307",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:31"
+          },
+          {
+            "label": "_balances",
+            "offset": 0,
+            "slot": "308",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "label": "_tokenApprovals",
+            "offset": 0,
+            "slot": "309",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "label": "_operatorApprovals",
+            "offset": 0,
+            "slot": "310",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "311",
+            "type": "t_array(t_uint256)44_storage",
+            "contract": "ERC721Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:517"
+          },
+          {
+            "label": "totalSupply",
+            "offset": 0,
+            "slot": "355",
+            "type": "t_uint256",
+            "contract": "GuildCredential",
+            "src": "contracts/GuildCredential.sol:20"
+          },
+          {
+            "label": "cid",
+            "offset": 0,
+            "slot": "356",
+            "type": "t_string_storage",
+            "contract": "GuildCredential",
+            "src": "contracts/GuildCredential.sol:23"
+          },
+          {
+            "label": "hasClaimed",
+            "offset": 0,
+            "slot": "357",
+            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)6113,t_bool))",
+            "contract": "GuildCredential",
+            "src": "contracts/GuildCredential.sol:25"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "358",
+            "type": "t_array(t_uint256)47_storage",
+            "contract": "GuildCredential",
+            "src": "contracts/GuildCredential.sol:28"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)44_storage": {
+            "label": "uint256[44]",
+            "numberOfBytes": "1408"
+          },
+          "t_array(t_uint256)47_storage": {
+            "label": "uint256[47]",
+            "numberOfBytes": "1504"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_bytes_storage": {
+            "label": "bytes",
+            "numberOfBytes": "32"
+          },
+          "t_contract(ENSInterface)973": {
+            "label": "contract ENSInterface",
+            "numberOfBytes": "20"
+          },
+          "t_contract(LinkTokenInterface)1068": {
+            "label": "contract LinkTokenInterface",
+            "numberOfBytes": "20"
+          },
+          "t_contract(OperatorInterface)1148": {
+            "label": "contract OperatorInterface",
+            "numberOfBytes": "20"
+          },
+          "t_enum(GuildAction)6113": {
+            "label": "enum IGuildCredential.GuildAction",
+            "members": [
+              "HAS_ACCESS",
+              "HAS_ROLE",
+              "IS_ADMIN",
+              "IS_OWNER",
+              "JOINED_GUILD"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_enum(GuildAction)6113,t_bool))": {
+            "label": "mapping(address => mapping(enum IGuildCredential.GuildAction => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_address)": {
+            "label": "mapping(bytes32 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RequestParams)5733_storage)": {
+            "label": "mapping(bytes32 => struct GuildOracle.RequestParams)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_enum(GuildAction)6113,t_bool)": {
+            "label": "mapping(enum IGuildCredential.GuildAction => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(RequestParams)5733_storage": {
+            "label": "struct GuildOracle.RequestParams",
+            "members": [
+              {
+                "label": "userAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "args",
+                "type": "t_bytes_storage",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
     }
   }
 }

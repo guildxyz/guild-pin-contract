@@ -26,6 +26,7 @@ async function main() {
   await guildCredential.deployed();
 
   console.log("GuildCredential deployed to:", guildCredential.address);
+  console.log("Constructor arguments:", jobId, oracleFee.toString());
 }
 
 main().catch((error) => {
