@@ -15,6 +15,9 @@ contract GuildCredential is IGuildCredential, Initializable, GuildOracle, ERC721
 
     mapping(address => mapping(GuildAction => bool)) public hasClaimed;
 
+    /// @notice Empty space reserved for future updates.
+    uint256[47] private __gap;
+
     /// @notice Sets some of the details of the oracle.
     /// @param jobId The id of the job to run on the oracle.
     /// @param oracleFee The amount of tokens to forward to the oracle with every request.

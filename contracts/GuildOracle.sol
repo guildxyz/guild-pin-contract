@@ -39,6 +39,9 @@ abstract contract GuildOracle is Initializable, ChainlinkClient {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     bytes32 internal immutable jobId;
 
+    /// @notice Empty space reserved for future updates.
+    uint256[47] private __gap;
+
     /// @notice Error thrown when an address doesn't have the needed role.
     /// @param userAddress The address of the queried user.
     error NoAccess(address userAddress);
