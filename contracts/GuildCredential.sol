@@ -6,6 +6,7 @@ import { IGuildCredential } from "./interfaces/IGuildCredential.sol";
 import { SoulboundERC721 } from "./token/SoulboundERC721.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { StringsUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title An NFT representing actions taken by Guild.xyz users.
@@ -17,12 +18,14 @@ contract GuildCredential is
     GuildOracle,
     SoulboundERC721
 {
+    using StringsUpgradeable for uint256;
+
     uint256 public totalSupply;
 
     /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
     string internal cid;
 
-    mapping(address => mapping(GuildAction => bool)) public hasClaimed;
+    mapping(address => mapping(GuildAction => mapping(uint256 => bool))) public hasClaimed;
 
     /// @notice Empty space reserved for future updates.
     uint256[47] private __gap;
@@ -55,4 +58,60 @@ contract GuildCredential is
 
     // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address) internal override onlyOwner {}
+
+    function claim(GuildAction guildAction, uint256 guildId) external {
+        if (hasClaimed[msg.sender][guildAction][guildId]) revert AlreadyClaimed();
+
+        uint256 tokenId = totalSupply;
+
+        if (guildAction == GuildAction.JOINED_GUILD)
+            requestGuildJoinCheck(
+                msg.sender,
+                guildId,
+                this.fulfillClaim.selector,
+                abi.encode(tokenId, msg.sender, GuildAction.JOINED_GUILD, guildId)
+            );
+        else if (guildAction == GuildAction.IS_OWNER)
+            requestGuildOwnerCheck(
+                msg.sender,
+                guildId,
+                this.fulfillClaim.selector,
+                abi.encode(tokenId, msg.sender, GuildAction.IS_OWNER, guildId)
+            );
+        else if (guildAction == GuildAction.IS_ADMIN)
+            requestGuildAdminCheck(
+                msg.sender,
+                guildId,
+                this.fulfillClaim.selector,
+                abi.encode(tokenId, msg.sender, GuildAction.IS_ADMIN, guildId)
+            );
+
+        emit ClaimRequested(msg.sender, guildAction, guildId);
+    }
+
+    /// @dev The actual claim function called by the oracle if the requirements are fulfilled.
+    function fulfillClaim(bytes32 requestId, uint256 access) public checkResponse(requestId, access) {
+        (uint256 tokenId, address receiver, GuildAction guildAction, uint256 id) = abi.decode(
+            requests[requestId].args,
+            (uint256, address, GuildAction, uint256)
+        );
+
+        hasClaimed[receiver][guildAction][id] = true;
+        _safeMint(receiver, tokenId);
+
+        emit Claimed(receiver, guildAction, id);
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        if (!_exists(tokenId)) revert NonExistentToken(tokenId);
+        return string.concat("ipfs://", cid, "/", tokenId.toString(), ".json");
+    }
+
+    /// A version of {_safeMint} aware of total supply.
+    function _safeMint(address to, uint256 tokenId) internal override {
+        unchecked {
+            ++totalSupply;
+        }
+        _safeMint(to, tokenId, "");
+    }
 }

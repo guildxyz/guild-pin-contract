@@ -16,6 +16,10 @@ module.exports = {
     "no-console": "off",
     "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
     "node/no-unpublished-import": "off",
-    "node/no-unsupported-features/es-syntax": ["error", { ignores: ["modules"] }]
+    "node/no-unsupported-features/es-syntax": ["error", { ignores: ["modules"] }],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error"
   }
 };
