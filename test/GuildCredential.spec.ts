@@ -7,13 +7,14 @@ import { ethers, upgrades } from "hardhat";
 const name = "GuildCredential";
 const symbol = "GUILD";
 const cid = "QmPaZD7i8TpLEeGjHtGoXe4mPKbRNNt8YTHH5nrKoqz9wJ";
-const etherFee = ethers.utils.parseEther("0.1");
+const fee = ethers.utils.parseEther("0.1");
 
 // ORACLE CONFIG
 const jobId = "0x7599d3c8f31e4ce78ad2b790cbcfc673".padEnd(66, "0");
 const oracleFee = ethers.utils.parseEther("0.05");
 
 // CONTRACTS
+let mockERC20: Contract;
 let chainlinkToken: Contract;
 let chainlinkOperator: Contract;
 let GuildCredential: ContractFactory;
@@ -48,6 +49,10 @@ describe("GuildCredential", () => {
   before("get accounts", async () => {
     [wallet0, randomWallet, treasury] = await ethers.getSigners();
 
+    const ERC20 = await ethers.getContractFactory("MockERC20");
+    mockERC20 = await ERC20.deploy("Mock Token", "MCK");
+    mockERC20.mint(wallet0.address, ethers.utils.parseEther("100"));
+
     const LINK = await ethers.getContractFactory("MockERC677");
     chainlinkToken = await LINK.deploy("Link Token", "LINK");
 
@@ -67,7 +72,8 @@ describe("GuildCredential", () => {
     );
     await credential.deployed();
 
-    credential.setFee(constants.AddressZero, etherFee);
+    credential.setFee(constants.AddressZero, fee);
+    credential.setFee(mockERC20.address, fee);
 
     chainlinkToken.mint(credential.address, ethers.utils.parseEther("100"));
   });
@@ -123,7 +129,7 @@ describe("GuildCredential", () => {
 
     it("should return the correct tokenURI", async () => {
       const requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
       const regex = new RegExp(`ipfs://${cid}/0.json`);
@@ -134,43 +140,77 @@ describe("GuildCredential", () => {
   context("#claim", () => {
     it("fails if the address has already claimed", async () => {
       const requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
       await expect(
-        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       ).to.be.revertedWithCustomError(credential, "AlreadyClaimed");
     });
 
     it("should be able to mint tokens for the same reason to different addresses", async () => {
-      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
       const tx1 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
+        .claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
     });
 
     it("should be able to mint tokens for the same address for different reasons", async () => {
-      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
       const tx1 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.IS_OWNER, 1985, { value: etherFee });
+        .claim(constants.AddressZero, GuildAction.IS_OWNER, 1985, { value: fee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
       const tx2 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: etherFee });
+        .claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee });
       const res2 = await tx2.wait();
       expect(res2.status).to.equal(1);
     });
 
+    it("should transfer ERC20 when there is no msg.value", async () => {
+      await mockERC20.approve(credential.address, constants.MaxUint256);
+      await expect(credential.claim(mockERC20.address, GuildAction.IS_ADMIN, 1985)).to.changeTokenBalances(
+        mockERC20,
+        [wallet0, treasury],
+        [fee.mul(-1), fee]
+      );
+    });
+
+    it("should transfer ether to treasury", async () => {
+      await expect(
+        credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee })
+      ).to.changeEtherBalances([wallet0, treasury], [fee.mul(-1), fee]);
+    });
+
+    it("should revert if an incorrect msg.value is received", async () => {
+      await expect(credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee.mul(2) }))
+        .to.be.revertedWithCustomError(credential, "IncorrectFee")
+        .withArgs(fee.mul(2), fee);
+      await expect(credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee.div(2) }))
+        .to.be.revertedWithCustomError(credential, "IncorrectFee")
+        .withArgs(fee.div(2), fee);
+    });
+
+    it("should set claimed status", async () => {
+      const action = GuildAction.JOINED_GUILD;
+      const guildId = 1985;
+      const claimedBefore = await credential.hasClaimed(wallet0.address, action, guildId);
+      await credential.claim(constants.AddressZero, action, guildId, { value: fee });
+      const claimed = await credential.hasClaimed(wallet0.address, action, guildId);
+      expect(claimedBefore).to.be.false; // eslint-disable-line no-unused-expressions
+      expect(claimed).to.be.true; // eslint-disable-line no-unused-expressions
+    });
+
     it("emits ClaimRequested event", async () => {
-      await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: etherFee }))
+      await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee }))
         .to.emit(credential, "ClaimRequested")
         .withArgs(wallet0.address, GuildAction.IS_ADMIN, 1985);
     });
@@ -181,7 +221,7 @@ describe("GuildCredential", () => {
 
     beforeEach("make a claim request", async () => {
       requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       );
     });
 

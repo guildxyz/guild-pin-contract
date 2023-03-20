@@ -2,13 +2,13 @@
 pragma solidity 0.8.19;
 
 import { IGuildCredential } from "./interfaces/IGuildCredential.sol";
+import { LibTransfer } from "./lib/LibTransfer.sol";
 import { SoulboundERC721 } from "./token/SoulboundERC721.sol";
 import { GuildOracle } from "./utils/GuildOracle.sol";
 import { TreasuryManager } from "./utils/TreasuryManager.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import { StringsUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 /// @title An NFT representing actions taken by Guild.xyz users.
@@ -22,13 +22,15 @@ contract GuildCredential is
     TreasuryManager
 {
     using StringsUpgradeable for uint256;
+    using LibTransfer for address;
+    using LibTransfer for address payable;
 
     uint256 public totalSupply;
 
     /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
     string internal cid;
 
-    mapping(address => mapping(GuildAction => mapping(uint256 => Claim))) internal claims;
+    mapping(address => mapping(GuildAction => mapping(uint256 => bool))) public hasClaimed;
 
     /// @notice Empty space reserved for future updates.
     uint256[47] private __gap;
@@ -66,8 +68,7 @@ contract GuildCredential is
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
     function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable {
-        Claim storage currentClaim = claims[msg.sender][guildAction][guildId];
-        if (currentClaim.claimed) revert AlreadyClaimed();
+        if (hasClaimed[msg.sender][guildAction][guildId]) revert AlreadyClaimed();
 
         uint256 tokenId = totalSupply;
 
@@ -94,14 +95,13 @@ contract GuildCredential is
             );
 
         // Fee collection
-        // When there is no msg.value, try transfering ERC20
-        if (msg.value == 0 && !IERC20Upgradeable(payToken).transferFrom(msg.sender, address(this), fee[payToken]))
-            revert TransferFailed(msg.sender, address(this));
+        // When there is no msg.value, try transferring ERC20
         // When there is msg.value, ensure it's the correct amount
+        if (msg.value == 0) payToken.sendToken(msg.sender, treasury, fee[payToken]);
         else if (msg.value != fee[address(0)]) revert IncorrectFee(msg.value, fee[address(0)]);
+        else treasury.sendEther(fee[address(0)]);
 
-        currentClaim.payToken = payToken;
-        currentClaim.claimed = true;
+        hasClaimed[msg.sender][guildAction][guildId] = true;
 
         emit ClaimRequested(msg.sender, guildAction, guildId);
     }
@@ -114,13 +114,12 @@ contract GuildCredential is
         );
 
         if (access != uint256(Access.ACCESS)) {
-            claims[msg.sender][guildAction][id].claimed = false;
-
-            // TODO: refund fees, minus oracle fee
+            hasClaimed[msg.sender][guildAction][id] = false;
 
             if (access == uint256(Access.NO_ACCESS)) revert NoAccess(receiver);
             if (access >= uint256(Access.CHECK_FAILED)) revert AccessCheckFailed(receiver);
         }
+
         _safeMint(receiver, tokenId);
 
         emit Claimed(receiver, guildAction, id);
@@ -129,10 +128,6 @@ contract GuildCredential is
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) revert NonExistentToken(tokenId);
         return string.concat("ipfs://", cid, "/", tokenId.toString(), ".json");
-    }
-
-    function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed) {
-        claimed = claims[account][guildAction][id].claimed;
     }
 
     /// A version of {_safeMint} aware of total supply.

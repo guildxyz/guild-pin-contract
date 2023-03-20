@@ -10,12 +10,6 @@ interface IGuildCredential {
         IS_ADMIN
     }
 
-    /// @notice The token used for paying for a credential and it's claim status.
-    struct Claim {
-        address payToken;
-        bool claimed;
-    }
-
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
     /// @param guildAction The action which has been checked via the oracle.
@@ -56,9 +50,4 @@ interface IGuildCredential {
     /// @notice Error thrown when trying to query info about a token that's not (yet) minted.
     /// @param tokenId The queried id.
     error NonExistentToken(uint256 tokenId);
-
-    /// @notice Error thrown when an ERC20 transfer failed.
-    /// @param from The sender of the token.
-    /// @param to The recipient of the token.
-    error TransferFailed(address from, address to);
 }
