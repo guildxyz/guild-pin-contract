@@ -82,6 +82,7 @@ describe("GuildCredential", () => {
     expect(await credential.name()).to.eq(name);
     expect(await credential.symbol()).to.eq(symbol);
     expect(await credential.owner()).to.eq(wallet0.address);
+    expect(await credential.treasury()).to.eq(treasury.address);
   });
 
   it("should be upgradeable", async () => {
@@ -93,6 +94,7 @@ describe("GuildCredential", () => {
     expect(await upgraded.name()).to.eq(name);
     expect(await upgraded.symbol()).to.eq(symbol);
     expect(await upgraded.owner()).to.eq(wallet0.address);
+    expect(await credential.treasury()).to.eq(treasury.address);
   });
 
   it("should be soulbound", async () => {
@@ -120,6 +122,52 @@ describe("GuildCredential", () => {
         constants.HashZero
       )
     ).to.be.revertedWithCustomError(GuildCredential, "Soulbound");
+  });
+
+  context("Treasury management", () => {
+    context("#setFee", () => {
+      it("should fail if a token's fee is attempted to be changed by anyone but the owner", async () => {
+        await expect(credential.connect(randomWallet).setFee(constants.AddressZero, 12)).to.be.revertedWith(
+          "Ownable: caller is not the owner"
+        );
+      });
+
+      it("should change the tokens' fees", async () => {
+        const mockFee0 = await credential.fee(mockERC20.address);
+        await credential.setFee(mockERC20.address, 69);
+        const mockFee1 = await credential.fee(mockERC20.address);
+        expect(mockFee0).to.not.eq(mockFee1);
+        expect(mockFee1).to.eq(69);
+      });
+
+      it("should emit FeeChanged event", async () => {
+        const token = randomWallet.address;
+        const newFee = 42;
+        await expect(credential.setFee(token, newFee)).to.emit(credential, "FeeChanged").withArgs(token, newFee);
+      });
+    });
+
+    context("#setTreasury", () => {
+      it("should fail if the treasury is attempted to be changed by anyone but the owner", async () => {
+        await expect(credential.connect(randomWallet).setTreasury(randomWallet.address)).to.be.revertedWith(
+          "Ownable: caller is not the owner"
+        );
+      });
+
+      it("should change the treasury address", async () => {
+        const treasury0 = await credential.treasury();
+        await credential.setTreasury(randomWallet.address);
+        const treasury1 = await credential.treasury();
+        expect(treasury0).to.not.eq(treasury1);
+        expect(treasury1).to.eq(randomWallet.address);
+      });
+
+      it("should emit TreasuryChanged event", async () => {
+        await expect(credential.setTreasury(randomWallet.address))
+          .to.emit(credential, "TreasuryChanged")
+          .withArgs(randomWallet.address);
+      });
+    });
   });
 
   context("#tokenURI", () => {
