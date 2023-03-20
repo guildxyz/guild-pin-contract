@@ -3,10 +3,11 @@ import { expect } from "chai";
 import { constants, Contract, ContractFactory, ContractTransaction } from "ethers";
 import { ethers, upgrades } from "hardhat";
 
-// NFT METADATA
+// NFT CONFIG
 const name = "GuildCredential";
 const symbol = "GUILD";
 const cid = "QmPaZD7i8TpLEeGjHtGoXe4mPKbRNNt8YTHH5nrKoqz9wJ";
+const etherFee = ethers.utils.parseEther("0.1");
 
 // ORACLE CONFIG
 const jobId = "0x7599d3c8f31e4ce78ad2b790cbcfc673".padEnd(66, "0");
@@ -21,6 +22,7 @@ let credential: Contract;
 // Test accounts
 let wallet0: SignerWithAddress;
 let randomWallet: SignerWithAddress;
+let treasury: SignerWithAddress;
 
 const oracleResponse = {
   NO_ACCESS: "0x".padEnd(66, "0"),
@@ -44,7 +46,7 @@ async function getRequestId(tx: ContractTransaction): Promise<string> {
 
 describe("GuildCredential", () => {
   before("get accounts", async () => {
-    [wallet0, randomWallet] = await ethers.getSigners();
+    [wallet0, randomWallet, treasury] = await ethers.getSigners();
 
     const LINK = await ethers.getContractFactory("MockERC677");
     chainlinkToken = await LINK.deploy("Link Token", "LINK");
@@ -57,13 +59,15 @@ describe("GuildCredential", () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
     credential = await upgrades.deployProxy(
       GuildCredential,
-      [name, symbol, cid, chainlinkToken.address, chainlinkOperator.address],
+      [name, symbol, cid, chainlinkToken.address, chainlinkOperator.address, treasury.address],
       {
         constructorArgs: [jobId, oracleFee],
         kind: "uups"
       }
     );
     await credential.deployed();
+
+    credential.setFee(constants.AddressZero, etherFee);
 
     chainlinkToken.mint(credential.address, ethers.utils.parseEther("100"));
   });
@@ -118,7 +122,9 @@ describe("GuildCredential", () => {
     });
 
     it("should return the correct tokenURI", async () => {
-      const requestId = await getRequestId(await credential.claim(GuildAction.JOINED_GUILD, 1985));
+      const requestId = await getRequestId(
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+      );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
       const regex = new RegExp(`ipfs://${cid}/0.json`);
       expect(regex.test(await credential.tokenURI(0))).to.eq(true);
@@ -127,37 +133,44 @@ describe("GuildCredential", () => {
 
   context("#claim", () => {
     it("fails if the address has already claimed", async () => {
-      const requestId = await getRequestId(await credential.claim(GuildAction.JOINED_GUILD, 1985));
-      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
-      await expect(credential.claim(GuildAction.JOINED_GUILD, 1985)).to.be.revertedWithCustomError(
-        credential,
-        "AlreadyClaimed"
+      const requestId = await getRequestId(
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
       );
+      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
+      await expect(
+        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+      ).to.be.revertedWithCustomError(credential, "AlreadyClaimed");
     });
 
     it("should be able to mint tokens for the same reason to different addresses", async () => {
-      const tx0 = await credential.claim(GuildAction.JOINED_GUILD, 1985);
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
-      const tx1 = await credential.connect(randomWallet).claim(GuildAction.JOINED_GUILD, 1985);
+      const tx1 = await credential
+        .connect(randomWallet)
+        .claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
     });
 
     it("should be able to mint tokens for the same address for different reasons", async () => {
-      const tx0 = await credential.claim(GuildAction.JOINED_GUILD, 1985);
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
-      const tx1 = await credential.connect(randomWallet).claim(GuildAction.IS_OWNER, 1985);
+      const tx1 = await credential
+        .connect(randomWallet)
+        .claim(constants.AddressZero, GuildAction.IS_OWNER, 1985, { value: etherFee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
-      const tx2 = await credential.connect(randomWallet).claim(GuildAction.IS_ADMIN, 1985);
+      const tx2 = await credential
+        .connect(randomWallet)
+        .claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: etherFee });
       const res2 = await tx2.wait();
       expect(res2.status).to.equal(1);
     });
 
     it("emits ClaimRequested event", async () => {
-      await expect(credential.claim(GuildAction.IS_ADMIN, 1985))
+      await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: etherFee }))
         .to.emit(credential, "ClaimRequested")
         .withArgs(wallet0.address, GuildAction.IS_ADMIN, 1985);
     });
@@ -167,7 +180,9 @@ describe("GuildCredential", () => {
     let requestId: string;
 
     beforeEach("make a claim request", async () => {
-      requestId = await getRequestId(await credential.claim(GuildAction.JOINED_GUILD, 1985));
+      requestId = await getRequestId(
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: etherFee })
+      );
     });
 
     it("fails if the address doesn't fulfill the requirements", async () => {
@@ -185,12 +200,6 @@ describe("GuildCredential", () => {
         .withArgs(wallet0.address);
       await expect(chainlinkOperator.tryFulfillOracleRequest(requestId, `${"0x".padEnd(65, "0")}9`))
         .to.be.revertedWithCustomError(credential, "AccessCheckFailed")
-        .withArgs(wallet0.address);
-    });
-
-    it("emits HasAccess event", async () => {
-      await expect(chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS))
-        .to.be.emit(credential, "HasAccess")
         .withArgs(wallet0.address);
     });
 
