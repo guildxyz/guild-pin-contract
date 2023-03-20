@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { ChainlinkClient } from "./external/chainlink/ChainlinkClient.sol";
+import { ChainlinkClient } from "../external/chainlink/ChainlinkClient.sol";
 import { Chainlink } from "@chainlink/contracts/src/v0.8/Chainlink.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { StringsUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
