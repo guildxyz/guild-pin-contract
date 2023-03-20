@@ -247,16 +247,6 @@ describe("GuildCredential", () => {
         .withArgs(fee.div(2), fee);
     });
 
-    it("should set claimed status", async () => {
-      const action = GuildAction.JOINED_GUILD;
-      const guildId = 1985;
-      const claimedBefore = await credential.hasClaimed(wallet0.address, action, guildId);
-      await credential.claim(constants.AddressZero, action, guildId, { value: fee });
-      const claimed = await credential.hasClaimed(wallet0.address, action, guildId);
-      expect(claimedBefore).to.be.false; // eslint-disable-line no-unused-expressions
-      expect(claimed).to.be.true; // eslint-disable-line no-unused-expressions
-    });
-
     it("emits ClaimRequested event", async () => {
       await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee }))
         .to.emit(credential, "ClaimRequested")

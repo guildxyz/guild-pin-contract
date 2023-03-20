@@ -101,8 +101,6 @@ contract GuildCredential is
         else if (msg.value != fee[address(0)]) revert IncorrectFee(msg.value, fee[address(0)]);
         else treasury.sendEther(fee[address(0)]);
 
-        hasClaimed[msg.sender][guildAction][guildId] = true;
-
         emit ClaimRequested(msg.sender, guildAction, guildId);
     }
 
@@ -114,12 +112,11 @@ contract GuildCredential is
         );
 
         if (access != uint256(Access.ACCESS)) {
-            hasClaimed[msg.sender][guildAction][id] = false;
-
             if (access == uint256(Access.NO_ACCESS)) revert NoAccess(receiver);
-            if (access >= uint256(Access.CHECK_FAILED)) revert AccessCheckFailed(receiver);
+            revert AccessCheckFailed(receiver);
         }
 
+        hasClaimed[receiver][guildAction][id] = true;
         _safeMint(receiver, tokenId);
 
         emit Claimed(receiver, guildAction, id);
