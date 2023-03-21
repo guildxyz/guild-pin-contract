@@ -25,6 +25,9 @@ abstract contract ChainlinkClient is Initializable {
     uint256 private sRequestCount; // = 1;
     mapping(bytes32 => address) private sPendingRequests;
 
+    /// @notice Empty space reserved for future updates.
+    uint256[46] private __gap;
+
     event ChainlinkRequested(bytes32 indexed id);
     event ChainlinkFulfilled(bytes32 indexed id);
     event ChainlinkCancelled(bytes32 indexed id);

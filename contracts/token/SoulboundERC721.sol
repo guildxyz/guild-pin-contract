@@ -5,6 +5,9 @@ import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC
 
 /// @title A simple, soulbound ERC721.
 contract SoulboundERC721 is ERC721Upgradeable {
+    /// @notice Empty space reserved for future updates.
+    uint256[50] private __gap;
+
     /// @notice Error thrown when a function's execution is not possible, because this is a soulbound NFT.
     error Soulbound();
 

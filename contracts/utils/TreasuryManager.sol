@@ -11,6 +11,9 @@ contract TreasuryManager is ITreasuryManager, Initializable, OwnableUpgradeable 
 
     mapping(address => uint256) public fee;
 
+    /// @notice Empty space reserved for future updates.
+    uint256[48] private __gap;
+
     /// @param treasury_ The address that will receive the fees.
     // solhint-disable-next-line func-name-mixedcase
     function __TreasuryManager_init(address payable treasury_) internal onlyInitializing {
