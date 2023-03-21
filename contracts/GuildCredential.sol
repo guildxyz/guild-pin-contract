@@ -70,28 +70,26 @@ contract GuildCredential is
     function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable {
         if (hasClaimed[msg.sender][guildAction][guildId]) revert AlreadyClaimed();
 
-        uint256 tokenId = totalSupply;
-
         if (guildAction == GuildAction.JOINED_GUILD)
             requestGuildJoinCheck(
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(tokenId, msg.sender, GuildAction.JOINED_GUILD, guildId)
+                abi.encode(msg.sender, GuildAction.JOINED_GUILD, guildId)
             );
         else if (guildAction == GuildAction.IS_OWNER)
             requestGuildOwnerCheck(
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(tokenId, msg.sender, GuildAction.IS_OWNER, guildId)
+                abi.encode(msg.sender, GuildAction.IS_OWNER, guildId)
             );
         else if (guildAction == GuildAction.IS_ADMIN)
             requestGuildAdminCheck(
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(tokenId, msg.sender, GuildAction.IS_ADMIN, guildId)
+                abi.encode(msg.sender, GuildAction.IS_ADMIN, guildId)
             );
 
         // Fee collection
@@ -106,9 +104,9 @@ contract GuildCredential is
 
     /// @dev The actual claim function called by the oracle if the requirements are fulfilled.
     function fulfillClaim(bytes32 requestId, uint256 access) public recordChainlinkFulfillment(requestId) {
-        (uint256 tokenId, address receiver, GuildAction guildAction, uint256 id) = abi.decode(
+        (address receiver, GuildAction guildAction, uint256 id) = abi.decode(
             requests[requestId].args,
-            (uint256, address, GuildAction, uint256)
+            (address, GuildAction, uint256)
         );
 
         if (access != uint256(Access.ACCESS)) {
@@ -117,7 +115,7 @@ contract GuildCredential is
         }
 
         hasClaimed[receiver][guildAction][id] = true;
-        _safeMint(receiver, tokenId);
+        _safeMint(receiver, totalSupply + 1);
 
         emit Claimed(receiver, guildAction, id);
     }

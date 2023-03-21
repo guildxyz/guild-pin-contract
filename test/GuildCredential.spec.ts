@@ -180,8 +180,8 @@ describe("GuildCredential", () => {
         await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
-      const regex = new RegExp(`ipfs://${cid}/0.json`);
-      expect(regex.test(await credential.tokenURI(0))).to.eq(true);
+      const regex = new RegExp(`ipfs://${cid}/1.json`);
+      expect(regex.test(await credential.tokenURI(1))).to.eq(true);
     });
   });
 
@@ -299,8 +299,9 @@ describe("GuildCredential", () => {
     });
 
     it("should mint the token", async () => {
-      const tokenId = await credential.totalSupply();
-      expect(await credential.balanceOf(wallet0.address)).to.eq("0");
+      const totalSupply = await credential.totalSupply();
+      const tokenId = totalSupply.add(1);
+      expect(await credential.balanceOf(wallet0.address)).to.eq(0);
       await expect(credential.ownerOf(tokenId)).to.be.revertedWith("ERC721: invalid token ID");
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
       expect(await credential.balanceOf(wallet0.address)).to.eq(1);
