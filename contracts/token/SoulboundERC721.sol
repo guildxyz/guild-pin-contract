@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 /// @title A simple, soulbound ERC721.
+/// @notice Allowance and transfer-related functions are disabled.
 contract SoulboundERC721 is ERC721Upgradeable {
     /// @notice Empty space reserved for future updates.
     uint256[50] private __gap;

@@ -2,6 +2,8 @@
 
 A simple, soulbound ERC721.
 
+Allowance and transfer-related functions are disabled.
+
 ## Functions
 
 ### __SoulboundERC721_init
