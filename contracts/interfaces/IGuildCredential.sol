@@ -52,6 +52,11 @@ interface IGuildCredential {
     /// @param requiredAmount The amount of fees required for minting.
     error IncorrectFee(uint256 paid, uint256 requiredAmount);
 
+    /// @notice Error thrown when such a token is attempted to be used for paying that has no fee set.
+    /// @dev The owner should set a fee for the token to solve this issue.
+    /// @param token The address of the token that cannot be used.
+    error IncorrectPayToken(address token);
+
     /// @notice Error thrown when trying to query info about a token that's not (yet) minted.
     /// @param tokenId The queried id.
     error NonExistentToken(uint256 tokenId);

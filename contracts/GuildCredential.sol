@@ -70,6 +70,9 @@ contract GuildCredential is
     function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable {
         if (claimedTokens[msg.sender][guildAction][guildId] != 0) revert AlreadyClaimed();
 
+        uint256 fee = fee[payToken];
+        if (fee == 0) revert IncorrectPayToken(payToken);
+
         if (guildAction == GuildAction.JOINED_GUILD)
             requestGuildJoinCheck(
                 msg.sender,
@@ -95,9 +98,9 @@ contract GuildCredential is
         // Fee collection
         // When there is no msg.value, try transferring ERC20
         // When there is msg.value, ensure it's the correct amount
-        if (msg.value == 0) payToken.sendToken(msg.sender, treasury, fee[payToken]);
-        else if (msg.value != fee[address(0)]) revert IncorrectFee(msg.value, fee[address(0)]);
-        else treasury.sendEther(fee[address(0)]);
+        if (msg.value == 0) payToken.sendToken(msg.sender, treasury, fee);
+        else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
+        else treasury.sendEther(fee);
 
         emit ClaimRequested(msg.sender, guildAction, guildId);
     }

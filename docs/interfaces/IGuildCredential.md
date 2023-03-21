@@ -146,6 +146,22 @@ Error thrown when an incorrect amount of fee is attempted to be paid.
 | paid | uint256 | The amount of funds received. |
 | requiredAmount | uint256 | The amount of fees required for minting. |
 
+### IncorrectPayToken
+
+```solidity
+error IncorrectPayToken(address token)
+```
+
+Error thrown when such a token is attempted to be used for paying that has no fee set.
+
+_The owner should set a fee for the token to solve this issue._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | address | The address of the token that cannot be used. |
+
 ### NonExistentToken
 
 ```solidity

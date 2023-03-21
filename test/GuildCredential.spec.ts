@@ -196,6 +196,12 @@ describe("GuildCredential", () => {
       ).to.be.revertedWithCustomError(credential, "AlreadyClaimed");
     });
 
+    it("fails if the token has no fees set", async () => {
+      await expect(credential.claim(randomWallet.address, GuildAction.JOINED_GUILD, 1985))
+        .to.be.revertedWithCustomError(credential, "IncorrectPayToken")
+        .withArgs(randomWallet.address);
+    });
+
     it("should be able to mint tokens for the same reason to different addresses", async () => {
       const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
       const res0 = await tx0.wait();
