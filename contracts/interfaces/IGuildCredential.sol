@@ -27,6 +27,11 @@ interface IGuildCredential {
     /// @param guildId The id to claim the token for.
     function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable;
 
+    /// @notice Burns a token from the sender.
+    /// @param guildAction The action to which the token belongs to.
+    /// @param guildId The id of the guild where the token belongs to.
+    function burn(GuildAction guildAction, uint256 guildId) external;
+
     /// @notice Event emitted whenever a claim succeeds (is fulfilled).
     /// @param receiver The address that received the tokens.
     /// @param guildAction The action to check via the oracle.

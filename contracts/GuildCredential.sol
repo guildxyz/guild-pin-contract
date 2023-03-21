@@ -30,7 +30,7 @@ contract GuildCredential is
     /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
     string internal cid;
 
-    mapping(address => mapping(GuildAction => mapping(uint256 => bool))) public hasClaimed;
+    mapping(address => mapping(GuildAction => mapping(uint256 => uint256))) internal claimedTokens;
 
     /// @notice Empty space reserved for future updates.
     uint256[47] private __gap;
@@ -68,7 +68,7 @@ contract GuildCredential is
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
     function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable {
-        if (hasClaimed[msg.sender][guildAction][guildId]) revert AlreadyClaimed();
+        if (claimedTokens[msg.sender][guildAction][guildId] != 0) revert AlreadyClaimed();
 
         if (guildAction == GuildAction.JOINED_GUILD)
             requestGuildJoinCheck(
@@ -114,10 +114,23 @@ contract GuildCredential is
             revert AccessCheckFailed(receiver);
         }
 
-        hasClaimed[receiver][guildAction][id] = true;
-        _safeMint(receiver, totalSupply + 1);
+        uint256 tokenId = totalSupply + 1;
+        claimedTokens[receiver][guildAction][id] = tokenId;
+        _safeMint(receiver, tokenId);
 
         emit Claimed(receiver, guildAction, id);
+    }
+
+    function burn(GuildAction guildAction, uint256 guildId) external {
+        uint256 tokenId = claimedTokens[msg.sender][guildAction][guildId];
+
+        claimedTokens[msg.sender][guildAction][guildId] = 0;
+
+        _burn(tokenId);
+    }
+
+    function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed) {
+        return claimedTokens[account][guildAction][id] != 0;
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {

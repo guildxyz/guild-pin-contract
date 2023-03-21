@@ -62,6 +62,24 @@ Claims tokens to the given address.
 | `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
 | `guildId` | uint256 | The id to claim the token for. |
 
+### burn
+
+```solidity
+function burn(
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 guildId
+) external
+```
+
+Burns a token from the sender.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
+| `guildId` | uint256 | The id of the guild where the token belongs to. |
+
 ## Events
 
 ### Claimed

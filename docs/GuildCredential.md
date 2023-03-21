@@ -25,23 +25,11 @@ string cid
 
 The ipfs hash, under which the off-chain metadata is uploaded.
 
-### hasClaimed
+### claimedTokens
 
 ```solidity
-mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => bool))) hasClaimed
+mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))) claimedTokens
 ```
-
-Returns true if the address has already claimed their token.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
 
 ## Functions
 
@@ -141,6 +129,49 @@ The actual claim function called by the oracle if the requirements are fulfilled
 | `requestId` | bytes32 |  |
 | `access` | uint256 |  |
 
+### burn
+
+```solidity
+function burn(
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 guildId
+) external
+```
+
+Burns a token from the sender.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
+| `guildId` | uint256 | The id of the guild where the token belongs to. |
+
+### hasClaimed
+
+```solidity
+function hasClaimed(
+    address account,
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 id
+) external returns (bool claimed)
+```
+
+Returns true if the address has already claimed their token.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `account` | address | The user's address. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action which has been checked via the oracle. |
+| `id` | uint256 | The id of the guild or role the token was minted for. |
+
+#### Return Values
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `claimed` | bool | Whether the address has claimed their token. |
 ### tokenURI
 
 ```solidity

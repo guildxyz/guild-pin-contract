@@ -42,7 +42,7 @@ async function getRequestId(tx: ContractTransaction): Promise<string> {
   // Assuming the first event's name is ChainlinkRequested
   expect(res.logs[0].topics[0]).to.eq("0xb5e6e01e79f91267dc17b4e6314d5d4d03593d2ceee0fbb452b750bd70ea5af9");
   // The first indexed parameter of ChainlinkRequested is the requestId
-  return res.logs[0].topics[1]; // eslint-disable-line prefer-destructuring
+  return res.logs[0].topics[1];
 }
 
 describe("GuildCredential", () => {
@@ -312,6 +312,27 @@ describe("GuildCredential", () => {
       await expect(chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS))
         .to.emit(credential, "Claimed")
         .withArgs(wallet0.address, GuildAction.JOINED_GUILD, 1985);
+    });
+  });
+
+  context("#burn", () => {
+    beforeEach("claim a token", async () => {
+      const requestId = await getRequestId(
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
+      );
+      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
+    });
+
+    it("resets hasClaimed to false", async () => {
+      const hasClaimed0 = await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985);
+      await credential.burn(GuildAction.JOINED_GUILD, 1985);
+      const hasClaimed1 = await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985);
+      expect(hasClaimed0).to.eq(true);
+      expect(hasClaimed1).to.eq(false);
+    });
+
+    it("burns the token", async () => {
+      await expect(credential.burn(GuildAction.JOINED_GUILD, 1985)).to.changeTokenBalance(credential, wallet0, -1);
     });
   });
 });
