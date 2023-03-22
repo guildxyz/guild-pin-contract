@@ -14,6 +14,10 @@ npm install
 
 Certain actions, like deploying to a public network or verifying source code on block explorers, need environment variables in a file named `.env`. See _[.env.example](.env.example)_ for more info.
 
+### Some additional steps before deployment
+
+Open the script you wish to use, depending on if you want to deploy the contracts for the first time or upgrade an existing deployment. Notice the constants at the top and edit them according to your needs.
+
 ## Contract deployment
 
 To deploy the smart contracts to a network, replace _[networkName]_ with the name of the network and _[scriptName]_ with the name of the script you wish to run in this command:
