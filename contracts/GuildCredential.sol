@@ -98,7 +98,7 @@ contract GuildCredential is
         // Fee collection
         // When there is no msg.value, try transferring ERC20
         // When there is msg.value, ensure it's the correct amount
-        if (msg.value == 0) payToken.sendToken(msg.sender, treasury, fee);
+        if (msg.value == 0) treasury.sendTokenFrom(msg.sender, payToken, fee);
         else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
         else treasury.sendEther(fee);
 

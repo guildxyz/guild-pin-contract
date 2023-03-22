@@ -13,7 +13,7 @@ function sendEther(
 ) internal
 ```
 
-Send ether to an address, forwarding all available gas and reverting on errors.
+Sends ether to an address, forwarding all available gas and reverting on errors.
 
 #### Parameters
 
@@ -26,21 +26,47 @@ Send ether to an address, forwarding all available gas and reverting on errors.
 
 ```solidity
 function sendToken(
-    address token,
-    address from,
     address to,
+    address token,
     uint256 amount
 ) internal
 ```
+
+Sends an ERC20 token to an address and reverts if the transfer returns false.
+
+Wrapper for {IERC20-transfer}.
 
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `token` | address |  |
-| `from` | address |  |
-| `to` | address |  |
-| `amount` | uint256 |  |
+| `to` | address | The recipient of the tokens. |
+| `token` | address | The address of the token to send. |
+| `amount` | uint256 | The amount of the token to send in base units. |
+
+### sendTokenFrom
+
+```solidity
+function sendTokenFrom(
+    address to,
+    address from,
+    address token,
+    uint256 amount
+) internal
+```
+
+Sends an ERC20 token to an address from another address and reverts if transferFrom returns false.
+
+Wrapper for {IERC20-transferFrom}.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `to` | address | The recipient of the tokens. |
+| `from` | address | The source of the tokens. |
+| `token` | address | The address of the token to send. |
+| `amount` | uint256 | The amount of the token to send in base units. |
 
 ## Custom errors
 
