@@ -2,15 +2,15 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x7af3204224cbA6cae696dbcF5952461f6C332E29",
-      "txHash": "0xe8cc0e08182730d7a2dfc8802f3af6a9b7593e50ec99ac251435425c5f377ef7",
+      "address": "0xa445E7D3AF54867D14467b44d5487352403D1E59",
+      "txHash": "0x3a2803d918b15212afd4798eb7c6d8b626e433892b4a34e6606016e62d107556",
       "kind": "uups"
     }
   ],
   "impls": {
-    "e14429428551efd563a3ddb1c1da3d98346387c9eef05a9ed96fe0c8ca234bef": {
-      "address": "0xac49ee0C3bDa5F851eAC9a3184a21041E9AfE379",
-      "txHash": "0x906faf3a6fc63aef246d6af542287c5c46ce6e676d56171c4405f358d8ef117a",
+    "f67ba8e87a95054202458ae58237d59f89820391a5d01dbceff74c1428619e67": {
+      "address": "0x96cb20F1fa8EDf5265d496B2FCb631B4541709FB",
+      "txHash": "0x5819e99d1dcc7db54a090edcd86c3e5176b00f982607f8d105467c9d45a145f5",
       "layout": {
         "solcVersion": "0.8.19",
         "storage": [
@@ -115,386 +115,7 @@
             "label": "requests",
             "offset": 0,
             "slot": "251",
-            "type": "t_mapping(t_bytes32,t_struct(RequestParams)7932_storage)",
-            "contract": "GuildOracle",
-            "src": "contracts/utils/GuildOracle.sol:32"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "252",
-            "type": "t_array(t_uint256)47_storage",
-            "contract": "GuildOracle",
-            "src": "contracts/utils/GuildOracle.sol:43"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "299",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC165Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
-          },
-          {
-            "label": "_name",
-            "offset": 0,
-            "slot": "349",
-            "type": "t_string_storage",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:25"
-          },
-          {
-            "label": "_symbol",
-            "offset": 0,
-            "slot": "350",
-            "type": "t_string_storage",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:28"
-          },
-          {
-            "label": "_owners",
-            "offset": 0,
-            "slot": "351",
-            "type": "t_mapping(t_uint256,t_address)",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:31"
-          },
-          {
-            "label": "_balances",
-            "offset": 0,
-            "slot": "352",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
-          },
-          {
-            "label": "_tokenApprovals",
-            "offset": 0,
-            "slot": "353",
-            "type": "t_mapping(t_uint256,t_address)",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
-          },
-          {
-            "label": "_operatorApprovals",
-            "offset": 0,
-            "slot": "354",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "355",
-            "type": "t_array(t_uint256)44_storage",
-            "contract": "ERC721Upgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:517"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "399",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "SoulboundERC721",
-            "src": "contracts/token/SoulboundERC721.sol:9"
-          },
-          {
-            "label": "treasury",
-            "offset": 0,
-            "slot": "449",
-            "type": "t_address_payable",
-            "contract": "TreasuryManager",
-            "src": "contracts/utils/TreasuryManager.sol:10"
-          },
-          {
-            "label": "fee",
-            "offset": 0,
-            "slot": "450",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "TreasuryManager",
-            "src": "contracts/utils/TreasuryManager.sol:12"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "451",
-            "type": "t_array(t_uint256)48_storage",
-            "contract": "TreasuryManager",
-            "src": "contracts/utils/TreasuryManager.sol:15"
-          },
-          {
-            "label": "totalSupply",
-            "offset": 0,
-            "slot": "499",
-            "type": "t_uint256",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:28"
-          },
-          {
-            "label": "cid",
-            "offset": 0,
-            "slot": "500",
-            "type": "t_string_storage",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:31"
-          },
-          {
-            "label": "claimedTokens",
-            "offset": 0,
-            "slot": "501",
-            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)6916,t_mapping(t_uint256,t_uint256)))",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:33"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "502",
-            "type": "t_array(t_uint256)47_storage",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:36"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_address_payable": {
-            "label": "address payable",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)44_storage": {
-            "label": "uint256[44]",
-            "numberOfBytes": "1408"
-          },
-          "t_array(t_uint256)46_storage": {
-            "label": "uint256[46]",
-            "numberOfBytes": "1472"
-          },
-          "t_array(t_uint256)47_storage": {
-            "label": "uint256[47]",
-            "numberOfBytes": "1504"
-          },
-          "t_array(t_uint256)48_storage": {
-            "label": "uint256[48]",
-            "numberOfBytes": "1536"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_bytes_storage": {
-            "label": "bytes",
-            "numberOfBytes": "32"
-          },
-          "t_contract(LinkTokenInterface)396": {
-            "label": "contract LinkTokenInterface",
-            "numberOfBytes": "20"
-          },
-          "t_contract(OperatorInterface)476": {
-            "label": "contract OperatorInterface",
-            "numberOfBytes": "20"
-          },
-          "t_enum(GuildAction)6916": {
-            "label": "enum IGuildCredential.GuildAction",
-            "members": [
-              "JOINED_GUILD",
-              "IS_OWNER",
-              "IS_ADMIN"
-            ],
-            "numberOfBytes": "1"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_mapping(t_enum(GuildAction)6916,t_mapping(t_uint256,t_uint256)))": {
-            "label": "mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256)))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_address)": {
-            "label": "mapping(bytes32 => address)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_struct(RequestParams)7932_storage)": {
-            "label": "mapping(bytes32 => struct GuildOracle.RequestParams)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_enum(GuildAction)6916,t_mapping(t_uint256,t_uint256))": {
-            "label": "mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_uint256)": {
-            "label": "mapping(uint256 => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
-            "numberOfBytes": "32"
-          },
-          "t_struct(RequestParams)7932_storage": {
-            "label": "struct GuildOracle.RequestParams",
-            "members": [
-              {
-                "label": "userAddress",
-                "type": "t_address",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "args",
-                "type": "t_bytes_storage",
-                "offset": 0,
-                "slot": "1"
-              }
-            ],
-            "numberOfBytes": "64"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
-    "a5522a67dd30a2589821d357b8a52552ea7d4360cb49dbd20104023d46d6d94b": {
-      "address": "0x7D299f2ba5bf75f04ce40aa361A677fDf8340e43",
-      "txHash": "0x5161c7677e50e34386f385dd0ade593ed29b995c868f79e129912b4358054593",
-      "layout": {
-        "solcVersion": "0.8.19",
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_owner",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_address",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "151",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
-            "label": "sLink",
-            "offset": 0,
-            "slot": "201",
-            "type": "t_contract(LinkTokenInterface)396",
-            "contract": "ChainlinkClient",
-            "src": "contracts/external/chainlink/ChainlinkClient.sol:23"
-          },
-          {
-            "label": "sOracle",
-            "offset": 0,
-            "slot": "202",
-            "type": "t_contract(OperatorInterface)476",
-            "contract": "ChainlinkClient",
-            "src": "contracts/external/chainlink/ChainlinkClient.sol:24"
-          },
-          {
-            "label": "sRequestCount",
-            "offset": 0,
-            "slot": "203",
-            "type": "t_uint256",
-            "contract": "ChainlinkClient",
-            "src": "contracts/external/chainlink/ChainlinkClient.sol:25"
-          },
-          {
-            "label": "sPendingRequests",
-            "offset": 0,
-            "slot": "204",
-            "type": "t_mapping(t_bytes32,t_address)",
-            "contract": "ChainlinkClient",
-            "src": "contracts/external/chainlink/ChainlinkClient.sol:26"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "205",
-            "type": "t_array(t_uint256)46_storage",
-            "contract": "ChainlinkClient",
-            "src": "contracts/external/chainlink/ChainlinkClient.sol:29"
-          },
-          {
-            "label": "requests",
-            "offset": 0,
-            "slot": "251",
-            "type": "t_mapping(t_bytes32,t_struct(RequestParams)6294_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(RequestParams)6386_storage)",
             "contract": "GuildOracle",
             "src": "contracts/utils/GuildOracle.sol:32"
           },
@@ -611,10 +232,10 @@
             "src": "contracts/GuildCredential.sol:28"
           },
           {
-            "label": "cid",
+            "label": "cids",
             "offset": 0,
             "slot": "500",
-            "type": "t_string_storage",
+            "type": "t_mapping(t_uint256,t_string_storage)",
             "contract": "GuildCredential",
             "src": "contracts/GuildCredential.sol:31"
           },
@@ -622,7 +243,7 @@
             "label": "claimedTokens",
             "offset": 0,
             "slot": "501",
-            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)5949,t_mapping(t_uint256,t_uint256)))",
+            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)5993,t_mapping(t_uint256,t_uint256)))",
             "contract": "GuildCredential",
             "src": "contracts/GuildCredential.sol:33"
           },
@@ -688,7 +309,7 @@
             "label": "contract OperatorInterface",
             "numberOfBytes": "20"
           },
-          "t_enum(GuildAction)5949": {
+          "t_enum(GuildAction)5993": {
             "label": "enum IGuildCredential.GuildAction",
             "members": [
               "JOINED_GUILD",
@@ -705,7 +326,7 @@
             "label": "mapping(address => mapping(address => bool))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_enum(GuildAction)5949,t_mapping(t_uint256,t_uint256)))": {
+          "t_mapping(t_address,t_mapping(t_enum(GuildAction)5993,t_mapping(t_uint256,t_uint256)))": {
             "label": "mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256)))",
             "numberOfBytes": "32"
           },
@@ -717,16 +338,20 @@
             "label": "mapping(bytes32 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_bytes32,t_struct(RequestParams)6294_storage)": {
+          "t_mapping(t_bytes32,t_struct(RequestParams)6386_storage)": {
             "label": "mapping(bytes32 => struct GuildOracle.RequestParams)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_enum(GuildAction)5949,t_mapping(t_uint256,t_uint256))": {
+          "t_mapping(t_enum(GuildAction)5993,t_mapping(t_uint256,t_uint256))": {
             "label": "mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))",
             "numberOfBytes": "32"
           },
           "t_mapping(t_uint256,t_address)": {
             "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)",
             "numberOfBytes": "32"
           },
           "t_mapping(t_uint256,t_uint256)": {
@@ -737,7 +362,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(RequestParams)6294_storage": {
+          "t_struct(RequestParams)6386_storage": {
             "label": "struct GuildOracle.RequestParams",
             "members": [
               {
