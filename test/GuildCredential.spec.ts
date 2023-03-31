@@ -6,7 +6,13 @@ import { ethers, upgrades } from "hardhat";
 // NFT CONFIG
 const name = "GuildCredential";
 const symbol = "GUILD";
-const cid = "QmPaZD7i8TpLEeGjHtGoXe4mPKbRNNt8YTHH5nrKoqz9wJ";
+const cids = [
+  "QmPaZD7i8TpLEeGjHtGoXe4mPKbRNNt8YTHH5nrKoqz9wJ",
+  "QmcaGypWsmzaSQQGuExUjtyTRvZ2FF525Ww6PBNWWgkkLj",
+  "Qmf1dCGhqRGvJXXd3epGMQiaPSDVFUGKiYG5ytwoRC9AcV",
+  "QmWqBgw5kXdnXHs4KGNUjZcBDbSrwCG7wzt55sSfvtCwvd",
+  "QmW5sPVbZDueZwvSuibteAwDFwFXhF8gebfptGBx1DZq1j"
+];
 const fee = ethers.utils.parseEther("0.1");
 
 // ORACLE CONFIG
@@ -64,7 +70,7 @@ describe("GuildCredential", () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
     credential = await upgrades.deployProxy(
       GuildCredential,
-      [name, symbol, cid, chainlinkToken.address, chainlinkOperator.address, treasury.address],
+      [name, symbol, chainlinkToken.address, chainlinkOperator.address, treasury.address],
       {
         constructorArgs: [jobId, oracleFee],
         kind: "uups"
@@ -176,62 +182,70 @@ describe("GuildCredential", () => {
     });
 
     it("should return the correct tokenURI", async () => {
-      const requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
-      );
-      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
-      const regex = new RegExp(`ipfs://${cid}/1.json`);
-      expect(regex.test(await credential.tokenURI(1))).to.eq(true);
+      /* eslint-disable no-await-in-loop */
+      for (let i = 0; i < cids.length; i += 1) {
+        const requestId = await getRequestId(
+          await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985 + i, cids[i], { value: fee })
+        );
+        await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
+        const regex = new RegExp(`ipfs://${cids[i]}`);
+        expect(regex.test(await credential.tokenURI(i + 1))).to.eq(true);
+      }
+      /* eslint-enable no-await-in-loop */
     });
   });
 
   context("#claim", () => {
     it("fails if the address has already claimed", async () => {
       const requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
       await expect(
-        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
+        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee })
       ).to.be.revertedWithCustomError(credential, "AlreadyClaimed");
     });
 
     it("fails if the token has no fees set", async () => {
-      await expect(credential.claim(randomWallet.address, GuildAction.JOINED_GUILD, 1985))
+      await expect(credential.claim(randomWallet.address, GuildAction.JOINED_GUILD, 1985, cids[0]))
         .to.be.revertedWithCustomError(credential, "IncorrectPayToken")
         .withArgs(randomWallet.address);
     });
 
     it("should be able to mint tokens for the same reason to different addresses", async () => {
-      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], {
+        value: fee
+      });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
       const tx1 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
+        .claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
     });
 
     it("should be able to mint tokens for the same address for different reasons", async () => {
-      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee });
+      const tx0 = await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], {
+        value: fee
+      });
       const res0 = await tx0.wait();
       expect(res0.status).to.equal(1);
       const tx1 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.IS_OWNER, 1985, { value: fee });
+        .claim(constants.AddressZero, GuildAction.IS_OWNER, 1985, cids[0], { value: fee });
       const res1 = await tx1.wait();
       expect(res1.status).to.equal(1);
       const tx2 = await credential
         .connect(randomWallet)
-        .claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee });
+        .claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, cids[0], { value: fee });
       const res2 = await tx2.wait();
       expect(res2.status).to.equal(1);
     });
 
     it("should transfer ERC20 when there is no msg.value", async () => {
       await mockERC20.approve(credential.address, constants.MaxUint256);
-      await expect(credential.claim(mockERC20.address, GuildAction.IS_ADMIN, 1985)).to.changeTokenBalances(
+      await expect(credential.claim(mockERC20.address, GuildAction.IS_ADMIN, 1985, cids[0])).to.changeTokenBalances(
         mockERC20,
         [wallet0, treasury],
         [fee.mul(-1), fee]
@@ -240,21 +254,25 @@ describe("GuildCredential", () => {
 
     it("should transfer ether to treasury", async () => {
       await expect(
-        credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee })
+        credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, cids[0], { value: fee })
       ).to.changeEtherBalances([wallet0, treasury], [fee.mul(-1), fee]);
     });
 
     it("should revert if an incorrect msg.value is received", async () => {
-      await expect(credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee.mul(2) }))
+      await expect(
+        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee.mul(2) })
+      )
         .to.be.revertedWithCustomError(credential, "IncorrectFee")
         .withArgs(fee.mul(2), fee);
-      await expect(credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee.div(2) }))
+      await expect(
+        credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee.div(2) })
+      )
         .to.be.revertedWithCustomError(credential, "IncorrectFee")
         .withArgs(fee.div(2), fee);
     });
 
     it("emits ClaimRequested event", async () => {
-      await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, { value: fee }))
+      await expect(credential.claim(constants.AddressZero, GuildAction.IS_ADMIN, 1985, cids[0], { value: fee }))
         .to.emit(credential, "ClaimRequested")
         .withArgs(wallet0.address, GuildAction.IS_ADMIN, 1985);
     });
@@ -265,7 +283,7 @@ describe("GuildCredential", () => {
 
     beforeEach("make a claim request", async () => {
       requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee })
       );
     });
 
@@ -324,7 +342,7 @@ describe("GuildCredential", () => {
   context("#burn", () => {
     beforeEach("claim a token", async () => {
       const requestId = await getRequestId(
-        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
     });
@@ -339,6 +357,40 @@ describe("GuildCredential", () => {
 
     it("burns the token", async () => {
       await expect(credential.burn(GuildAction.JOINED_GUILD, 1985)).to.changeTokenBalance(credential, wallet0, -1);
+    });
+  });
+
+  context("#updateTokenURI", () => {
+    beforeEach("claim a token", async () => {
+      const requestId = await getRequestId(
+        await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, cids[0], { value: fee })
+      );
+      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
+    });
+
+    it("fails if the token is not yet minted", async () => {
+      await expect(credential.updateTokenURI(2, cids[1]))
+        .to.be.revertedWithCustomError(credential, "NonExistentToken")
+        .withArgs(2);
+    });
+
+    it("fails if the sender is not the owner", async () => {
+      await expect(credential.connect(randomWallet).updateTokenURI(1, cids[1])).to.be.revertedWithCustomError(
+        credential,
+        "IncorrectSender"
+      );
+    });
+
+    it("should update cid", async () => {
+      const oldTokenURI = await credential.tokenURI(1);
+      await credential.updateTokenURI(1, cids[1]);
+      const newTokenURI = await credential.tokenURI(1);
+      expect(newTokenURI).to.not.eq(oldTokenURI);
+      expect(newTokenURI).to.contain(cids[1]);
+    });
+
+    it("emits TokenURIUpdated event", async () => {
+      await expect(credential.updateTokenURI(1, cids[1])).to.emit(credential, "TokenURIUpdated").withArgs(1);
     });
   });
 });
