@@ -208,21 +208,3 @@ See {IERC721Metadata-tokenURI}.
 | :--- | :--- | :---------- |
 | `tokenId` | uint256 |  |
 
-### _safeMint
-
-```solidity
-function _safeMint(
-    address to,
-    uint256 tokenId
-) internal
-```
-
-A version of {_safeMint} aware of total supply.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `to` | address |  |
-| `tokenId` | uint256 |  |
-

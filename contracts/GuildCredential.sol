@@ -115,8 +115,13 @@ contract GuildCredential is
         }
 
         uint256 tokenId = totalSupply + 1;
+
         claimedTokens[receiver][guildAction][id] = tokenId;
         cids[tokenId] = cid;
+        unchecked {
+            ++totalSupply;
+        }
+
         _safeMint(receiver, tokenId);
 
         emit Claimed(receiver, guildAction, id);
@@ -127,6 +132,9 @@ contract GuildCredential is
 
         claimedTokens[msg.sender][guildAction][guildId] = 0;
         delete cids[tokenId];
+        unchecked {
+            --totalSupply;
+        }
 
         _burn(tokenId);
     }
@@ -148,13 +156,5 @@ contract GuildCredential is
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) revert NonExistentToken(tokenId);
         return string.concat("ipfs://", cids[tokenId]);
-    }
-
-    /// A version of {_safeMint} aware of total supply.
-    function _safeMint(address to, uint256 tokenId) internal override {
-        unchecked {
-            ++totalSupply;
-        }
-        _safeMint(to, tokenId, "");
     }
 }

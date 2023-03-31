@@ -322,6 +322,13 @@ describe("GuildCredential", () => {
       expect(await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985)).to.eq(true);
     });
 
+    it("should increment the total supply", async () => {
+      const totalSupply0 = await credential.totalSupply();
+      await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
+      const totalSupply1 = await credential.totalSupply();
+      expect(totalSupply1).to.eq(totalSupply0.add(1));
+    });
+
     it("should mint the token", async () => {
       const totalSupply = await credential.totalSupply();
       const tokenId = totalSupply.add(1);
@@ -347,12 +354,19 @@ describe("GuildCredential", () => {
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
     });
 
-    it("resets hasClaimed to false", async () => {
+    it("should reset hasClaimed to false", async () => {
       const hasClaimed0 = await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985);
       await credential.burn(GuildAction.JOINED_GUILD, 1985);
       const hasClaimed1 = await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985);
       expect(hasClaimed0).to.eq(true);
       expect(hasClaimed1).to.eq(false);
+    });
+
+    it("should decrement the total supply", async () => {
+      const totalSupply0 = await credential.totalSupply();
+      await credential.burn(GuildAction.JOINED_GUILD, 1985);
+      const totalSupply1 = await credential.totalSupply();
+      expect(totalSupply1).to.eq(totalSupply0.sub(1));
     });
 
     it("burns the token", async () => {
