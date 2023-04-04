@@ -43,13 +43,13 @@ interface IGuildCredential {
     /// @param receiver The address that received the tokens.
     /// @param guildAction The action to check via the oracle.
     /// @param guildId The id the token has been claimed for.
-    event Claimed(address receiver, GuildAction guildAction, uint256 guildId);
+    event Claimed(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
 
     /// @notice Event emitted whenever a claim is requested.
     /// @param receiver The address that receives the tokens.
     /// @param guildAction The action that has been checked via the oracle.
     /// @param guildId The id to claim the token for.
-    event ClaimRequested(address receiver, GuildAction guildAction, uint256 guildId);
+    event ClaimRequested(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
 
     /// @notice Event emitted whenever a token's cid is updated.
     /// @param tokenId The id of the updated token.
