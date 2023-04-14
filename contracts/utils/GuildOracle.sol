@@ -203,7 +203,7 @@ abstract contract GuildOracle is Initializable, ChainlinkClient {
         Chainlink.Request memory req = buildChainlinkRequest(jobId, address(this), callbackFn);
         req.add("get", url);
         req.add("path", path);
-        req.addInt("multiply", 1);
+        req.addInt("times", 1);
         bytes32 requestId = sendChainlinkRequest(req, oracleFee);
 
         RequestParams storage lastRequest = requests[requestId];
