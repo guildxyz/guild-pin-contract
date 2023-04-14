@@ -17,19 +17,21 @@ The total amount of tokens in existence.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 
-### cid
-
-```solidity
-string cid
-```
-
-The ipfs hash, under which the off-chain metadata is uploaded.
-
 ### claimedTokens
 
 ```solidity
 mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))) claimedTokens
 ```
+
+### URI_PREFIX
+
+```solidity
+string URI_PREFIX
+```
+
+The prefix of the metadata's URI (tokenURI).
+
+_Ideally "ipfs://{cid}/" or a url that resolves to an ipfs hash (using dnslink or w3name)._
 
 ## Functions
 
@@ -57,7 +59,6 @@ Sets some of the details of the oracle.
 function initialize(
     string name,
     string symbol,
-    string cid_,
     address linkToken,
     address oracleAddress,
     address payable treasury
@@ -72,7 +73,6 @@ Sets metadata and the oracle details.
 | :--- | :--- | :---------- |
 | `name` | string | The name of the token. |
 | `symbol` | string | The symbol of the token. |
-| `cid_` | string | The ipfs hash, under which the off-chain metadata is uploaded. |
 | `linkToken` | address | The address of the Chainlink token. |
 | `oracleAddress` | address | The address of the oracle processing the requests. |
 | `treasury` | address payable | The address where the collected fees will be sent. |
