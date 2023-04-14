@@ -7,10 +7,10 @@ const symbol = ""; // The short, usually all caps symbol of the token.
 const treasury = "0x...";
 
 // ORACLE CONFIG (default: Goerli)
-const chainlinkToken = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
-const oracleAddress = "0x188b71C9d27cDeE01B9b0dfF5C1aff62E8D6F434";
-const jobId = "0x7599d3c8f31e4ce78ad2b790cbcfc673".padEnd(66, "0");
-const oracleFee = ethers.utils.parseEther("0.05");
+const chainlinkToken = "0x779877A7B0D9E8603169DdbD7836e478b4624789";
+const oracleAddress = "0x6c2e87340Ef6F3b7e21B2304D6C057091814f25E";
+const jobId = "0xb4bb896b5d9b4dc694e84479563a537a".padEnd(66, "0");
+const oracleFee = ethers.utils.parseEther("0");
 
 async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
