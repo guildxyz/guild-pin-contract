@@ -17,13 +17,13 @@ The total amount of tokens in existence.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 
-### cids
+### cid
 
 ```solidity
-mapping(uint256 => string) cids
+string cid
 ```
 
-Mapping tokenIds to cids (for tokenURIs).
+The ipfs hash, under which the off-chain metadata is uploaded.
 
 ### claimedTokens
 
@@ -57,6 +57,7 @@ Sets some of the details of the oracle.
 function initialize(
     string name,
     string symbol,
+    string cid_,
     address linkToken,
     address oracleAddress,
     address payable treasury
@@ -71,6 +72,7 @@ Sets metadata and the oracle details.
 | :--- | :--- | :---------- |
 | `name` | string | The name of the token. |
 | `symbol` | string | The symbol of the token. |
+| `cid_` | string | The ipfs hash, under which the off-chain metadata is uploaded. |
 | `linkToken` | address | The address of the Chainlink token. |
 | `oracleAddress` | address | The address of the oracle processing the requests. |
 | `treasury` | address payable | The address where the collected fees will be sent. |
@@ -95,8 +97,7 @@ function _authorizeUpgrade(
 function claim(
     address payToken,
     enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
-    string cid
+    uint256 guildId
 ) external
 ```
 
@@ -109,7 +110,6 @@ Claims tokens to the given address.
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
 | `guildId` | uint256 | The id to claim the token for. |
-| `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 
 ### fulfillClaim
 
@@ -146,26 +146,6 @@ Burns a token from the sender.
 | :--- | :--- | :---------- |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
-
-### updateTokenURI
-
-```solidity
-function updateTokenURI(
-    uint256 tokenId,
-    string newCid
-) external
-```
-
-Updates a minted token's URI.
-
-Only callable by the owner of the token.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the token to be updated. |
-| `newCid` | string | The new cid that points to the updated metadata. |
 
 ### hasClaimed
 

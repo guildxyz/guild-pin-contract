@@ -3,6 +3,7 @@ import { ethers, upgrades } from "hardhat";
 // NFT METADATA
 const name = ""; // The name of the token.
 const symbol = ""; // The short, usually all caps symbol of the token.
+const cid = ""; // The ipfs hash, under which the off-chain metadata is uploaded.
 
 const treasury = "0x...";
 
@@ -16,7 +17,7 @@ async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
   const guildCredential = await upgrades.deployProxy(
     GuildCredential,
-    [name, symbol, chainlinkToken, oracleAddress, treasury],
+    [name, symbol, cid, chainlinkToken, oracleAddress, treasury],
     { constructorArgs: [jobId, oracleFee], kind: "uups" }
   );
 

@@ -27,8 +27,8 @@ contract GuildCredential is
 
     uint256 public totalSupply;
 
-    /// @notice Mapping tokenIds to cids (for tokenURIs).
-    mapping(uint256 => string) internal cids;
+    /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
+    string internal cid;
 
     mapping(address => mapping(GuildAction => mapping(uint256 => uint256))) internal claimedTokens;
 
@@ -44,12 +44,14 @@ contract GuildCredential is
     /// @notice Sets metadata and the oracle details.
     /// @param name The name of the token.
     /// @param symbol The symbol of the token.
+    /// @param cid_ The ipfs hash, under which the off-chain metadata is uploaded.
     /// @param linkToken The address of the Chainlink token.
     /// @param oracleAddress The address of the oracle processing the requests.
     /// @param treasury The address where the collected fees will be sent.
     function initialize(
         string memory name,
         string memory symbol,
+        string memory cid_,
         address linkToken,
         address oracleAddress,
         address payable treasury
@@ -59,12 +61,13 @@ contract GuildCredential is
         __GuildOracle_init(linkToken, oracleAddress);
         __SoulboundERC721_init(name, symbol);
         __TreasuryManager_init(treasury);
+        cid = cid_;
     }
 
     // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
-    function claim(address payToken, GuildAction guildAction, uint256 guildId, string memory cid) external payable {
+    function claim(address payToken, GuildAction guildAction, uint256 guildId) external payable {
         if (claimedTokens[msg.sender][guildAction][guildId] != 0) revert AlreadyClaimed();
 
         uint256 fee = fee[payToken];
@@ -75,21 +78,21 @@ contract GuildCredential is
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(msg.sender, GuildAction.JOINED_GUILD, guildId, cid)
+                abi.encode(msg.sender, GuildAction.JOINED_GUILD, guildId)
             );
         else if (guildAction == GuildAction.IS_OWNER)
             requestGuildOwnerCheck(
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(msg.sender, GuildAction.IS_OWNER, guildId, cid)
+                abi.encode(msg.sender, GuildAction.IS_OWNER, guildId)
             );
         else if (guildAction == GuildAction.IS_ADMIN)
             requestGuildAdminCheck(
                 msg.sender,
                 guildId,
                 this.fulfillClaim.selector,
-                abi.encode(msg.sender, GuildAction.IS_ADMIN, guildId, cid)
+                abi.encode(msg.sender, GuildAction.IS_ADMIN, guildId)
             );
 
         // Fee collection
@@ -104,9 +107,9 @@ contract GuildCredential is
 
     /// @dev The actual claim function called by the oracle if the requirements are fulfilled.
     function fulfillClaim(bytes32 requestId, uint256 access) public recordChainlinkFulfillment(requestId) {
-        (address receiver, GuildAction guildAction, uint256 id, string memory cid) = abi.decode(
+        (address receiver, GuildAction guildAction, uint256 id) = abi.decode(
             requests[requestId].args,
-            (address, GuildAction, uint256, string)
+            (address, GuildAction, uint256)
         );
 
         if (access != uint256(Access.ACCESS)) {
@@ -117,7 +120,6 @@ contract GuildCredential is
         uint256 tokenId = totalSupply + 1;
 
         claimedTokens[receiver][guildAction][id] = tokenId;
-        cids[tokenId] = cid;
         unchecked {
             ++totalSupply;
         }
@@ -131,22 +133,11 @@ contract GuildCredential is
         uint256 tokenId = claimedTokens[msg.sender][guildAction][guildId];
 
         claimedTokens[msg.sender][guildAction][guildId] = 0;
-        delete cids[tokenId];
         unchecked {
             --totalSupply;
         }
 
         _burn(tokenId);
-    }
-
-    function updateTokenURI(uint256 tokenId, string calldata newCid) external {
-        address owner = _ownerOf(tokenId);
-        if (owner == address(0)) revert NonExistentToken(tokenId);
-        if (owner != msg.sender) revert IncorrectSender();
-
-        cids[tokenId] = newCid;
-
-        emit TokenURIUpdated(tokenId);
     }
 
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed) {
@@ -155,6 +146,6 @@ contract GuildCredential is
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) revert NonExistentToken(tokenId);
-        return string.concat("ipfs://", cids[tokenId]);
+        return string.concat("ipfs://", cid, "/", tokenId.toString(), ".json");
     }
 }

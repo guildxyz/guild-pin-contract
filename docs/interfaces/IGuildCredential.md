@@ -48,8 +48,7 @@ The total amount of tokens in existence.
 function claim(
     address payToken,
     enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
-    string cid
+    uint256 guildId
 ) external
 ```
 
@@ -62,7 +61,6 @@ Claims tokens to the given address.
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
 | `guildId` | uint256 | The id to claim the token for. |
-| `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 
 ### burn
 
@@ -81,26 +79,6 @@ Burns a token from the sender.
 | :--- | :--- | :---------- |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
-
-### updateTokenURI
-
-```solidity
-function updateTokenURI(
-    uint256 tokenId,
-    string newCid
-) external
-```
-
-Updates a minted token's URI.
-
-Only callable by the owner of the token.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the token to be updated. |
-| `newCid` | string | The new cid that points to the updated metadata. |
 
 ## Events
 
@@ -142,21 +120,6 @@ Event emitted whenever a claim is requested.
 | `receiver` | address | The address that receives the tokens. |
 | `guildAction` | enum IGuildCredential.GuildAction | The action that has been checked via the oracle. |
 | `guildId` | uint256 | The id to claim the token for. |
-### TokenURIUpdated
-
-```solidity
-event TokenURIUpdated(
-    uint256 tokenId
-)
-```
-
-Event emitted whenever a token's cid is updated.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the updated token. |
 
 ## Custom errors
 
@@ -198,14 +161,6 @@ _The owner should set a fee for the token to solve this issue._
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | address | The address of the token that cannot be used. |
-
-### IncorrectSender
-
-```solidity
-error IncorrectSender()
-```
-
-Error thrown when the sender is not permitted to do a specific action.
 
 ### NonExistentToken
 
