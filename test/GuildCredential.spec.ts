@@ -6,7 +6,7 @@ import { ethers, upgrades } from "hardhat";
 // NFT CONFIG
 const name = "GuildCredential";
 const symbol = "GUILD";
-const cid = "QmPaZD7i8TpLEeGjHtGoXe4mPKbRNNt8YTHH5nrKoqz9wJ";
+const uriPrefix = "https://credential.guild.xyz/";
 const fee = ethers.utils.parseEther("0.1");
 
 // ORACLE CONFIG
@@ -64,7 +64,7 @@ describe("GuildCredential", () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
     credential = await upgrades.deployProxy(
       GuildCredential,
-      [name, symbol, cid, chainlinkToken.address, chainlinkOperator.address, treasury.address],
+      [name, symbol, chainlinkToken.address, chainlinkOperator.address, treasury.address],
       {
         constructorArgs: [jobId, oracleFee],
         kind: "uups"
@@ -180,7 +180,7 @@ describe("GuildCredential", () => {
         await credential.claim(constants.AddressZero, GuildAction.JOINED_GUILD, 1985, { value: fee })
       );
       await chainlinkOperator.tryFulfillOracleRequest(requestId, oracleResponse.ACCESS);
-      const regex = new RegExp(`ipfs://${cid}/1.json`);
+      const regex = new RegExp(`${uriPrefix}1.json`);
       expect(regex.test(await credential.tokenURI(1))).to.eq(true);
     });
   });

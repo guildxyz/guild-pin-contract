@@ -27,13 +27,14 @@ contract GuildCredential is
 
     uint256 public totalSupply;
 
-    /// @notice The ipfs hash, under which the off-chain metadata is uploaded.
-    string internal cid;
-
     mapping(address => mapping(GuildAction => mapping(uint256 => uint256))) internal claimedTokens;
 
+    /// @notice The prefix of the metadata's URI (tokenURI).
+    /// @dev Ideally "ipfs://{cid}/" or a url that resolves to an ipfs hash (using dnslink or w3name).
+    string internal constant URI_PREFIX = "https://credential.guild.xyz/";
+
     /// @notice Empty space reserved for future updates.
-    uint256[47] private __gap;
+    uint256[48] private __gap;
 
     /// @notice Sets some of the details of the oracle.
     /// @param jobId The id of the job to run on the oracle.
@@ -44,14 +45,12 @@ contract GuildCredential is
     /// @notice Sets metadata and the oracle details.
     /// @param name The name of the token.
     /// @param symbol The symbol of the token.
-    /// @param cid_ The ipfs hash, under which the off-chain metadata is uploaded.
     /// @param linkToken The address of the Chainlink token.
     /// @param oracleAddress The address of the oracle processing the requests.
     /// @param treasury The address where the collected fees will be sent.
     function initialize(
         string memory name,
         string memory symbol,
-        string memory cid_,
         address linkToken,
         address oracleAddress,
         address payable treasury
@@ -61,7 +60,6 @@ contract GuildCredential is
         __GuildOracle_init(linkToken, oracleAddress);
         __SoulboundERC721_init(name, symbol);
         __TreasuryManager_init(treasury);
-        cid = cid_;
     }
 
     // solhint-disable-next-line no-empty-blocks
@@ -146,6 +144,6 @@ contract GuildCredential is
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) revert NonExistentToken(tokenId);
-        return string.concat("ipfs://", cid, "/", tokenId.toString(), ".json");
+        return string.concat(URI_PREFIX, tokenId.toString(), ".json");
     }
 }
