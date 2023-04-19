@@ -91,4 +91,4 @@ The documentation for the contracts is generated via the [solidity-docgen](https
 npm run docgen
 ```
 
-The output can be found in the _[docs](docs)_ folder.
+The output can be found in the _[docs/contracts](docs/contracts)_ folder.
