@@ -49,6 +49,9 @@ The last one does look like a valid solution - probably the best one if we chose
   - signs the transaction data using a private key and returns it
     - the transaction data should contain: the user's address, the GuildAction, the id (guildId/roleId) and the cid
 - the user initiates a transaction to the contract. Supplies the transaction data, the signature and the fee
-- the contract verifies the signature and mints the credential
+- the contract:
+  - verifies the signature
+  - sends the fee to the treasury
+  - mints the credential
 
-![flow](flow.png)
+![flow](img/flow.png)
