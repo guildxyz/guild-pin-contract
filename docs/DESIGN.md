@@ -11,7 +11,31 @@ We arrived to a stage where we should rethink how distributing credentials is do
 
 ## Solutions
 
-### Oracle (current, in progress)
+### Verify on a centralized server (proposed)
+
+The server runs either a separate service or it's a part of Guild's [core](https://github.com/agoraxyz/guild-backend).
+
+#### Flow
+
+- the user selects the credential they want to mint on the Guild UI (only the ones the user has access to are displayed)
+- the UI makes a call to the server
+  - parameters: userAddress, [guildAction](contracts/interfaces/IGuildCredential.md#guildaction), id (guildId/roleId based on the check)
+- the server:
+  - checks the access (probably an api call to the core or direct db access)
+  - generates the metadata and uploads/pins it on IPFS
+  - signs the transaction data using a private key and returns the signature alongside the cid
+- the user initiates a transaction to the contract. Supplies the signed data, the signature and the fee
+- the contract:
+  - verifies the signature (reverts if it's invalid)
+  - updates the claimedTokens mapping
+  - sends the fee to the treasury
+  - mints the credential
+
+![flow](img/flow.png)
+
+### Verify using an oracle (discontinued)
+
+The idea was to use a [Chainlink](https://chain.link/) oracle to check access dynamically. Uploading the metadata would have happened either on the client side or via a serverless function. However, after trying various implementations, we discarded the idea as it was resource-heavy and unnecessarily complicated.
 
 #### The flow without caring for metadata
 
@@ -22,7 +46,7 @@ We arrived to a stage where we should rethink how distributing credentials is do
 - the oracle sends a transaction to the contract with the result
 - the contract either mints the credential or reverts, based on the result
 
-#### The metadata problem
+#### The metadata problem and it's solutions
 
 - if it's uploaded prior to the contract deploy, it's not dynamic
 - if it's uploaded right before the transaction, we should ensure the tokenURI function still works. This can be done in two ways:
@@ -36,22 +60,3 @@ We arrived to a stage where we should rethink how distributing credentials is do
   - return the new cid to the contract
 
 The last one does look like a valid solution - probably the best one if we chose oracles.
-
-### Centralized server (proposed)
-
-#### Flow
-
-- the user selects the credential they want to mint on the Guild UI (only the ones the user has access to are displayed)
-- the UI makes a call to the server
-- the server:
-  - checks the access
-  - generates the metadata and uploads it
-  - signs the transaction data using a private key and returns it
-    - the transaction data should contain: the user's address, the GuildAction, the id (guildId/roleId) and the cid
-- the user initiates a transaction to the contract. Supplies the transaction data, the signature and the fee
-- the contract:
-  - verifies the signature
-  - sends the fee to the treasury
-  - mints the credential
-
-![flow](img/flow.png)
