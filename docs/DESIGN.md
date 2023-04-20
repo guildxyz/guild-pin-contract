@@ -13,7 +13,7 @@ We arrived to a stage where we should rethink how distributing credentials is do
 
 ### Verify on a centralized server (proposed)
 
-The server runs either a separate service or it's a part of Guild's [core](https://github.com/agoraxyz/guild-backend).
+The server-side code is a part of Guild's [core](https://github.com/agoraxyz/guild-backend). Later, we may consider moving it to a separate service, but it does not seem necessary at the time of writing.
 
 #### Flow
 
@@ -21,7 +21,7 @@ The server runs either a separate service or it's a part of Guild's [core](https
 - the UI makes a call to the server
   - parameters: userAddress, [guildAction](contracts/interfaces/IGuildCredential.md#guildaction), id (guildId/roleId based on the check)
 - the server:
-  - checks the access (probably an api call to the core or direct db access)
+  - checks the access (needs direct db access or an api call to the core in case of becoming a separate service)
   - generates the metadata and uploads/pins it on IPFS
   - signs the transaction data + current timestamp (unix seconds) using a private key
   - returns the timestamp, the cid and the signature
