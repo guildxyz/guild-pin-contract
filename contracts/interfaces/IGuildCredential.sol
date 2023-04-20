@@ -23,10 +23,21 @@ interface IGuildCredential {
 
     /// @notice Claims tokens to the given address.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
+    /// @param receiver The address that receives the token.
     /// @param guildAction The action to check via the oracle.
     /// @param guildId The id to claim the token for.
+    /// @param expirationTimestamp The signature is valid until then.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
-    function claim(address payToken, GuildAction guildAction, uint256 guildId, string memory cid) external payable;
+    /// @param signature The above parameters (except the payToken) signed by validSigner.
+    function claim(
+        address payToken,
+        address receiver,
+        GuildAction guildAction,
+        uint256 guildId,
+        uint256 expirationTimestamp,
+        string calldata cid,
+        bytes calldata signature
+    ) external payable;
 
     /// @notice Burns a token from the sender.
     /// @param guildAction The action to which the token belongs to.
@@ -44,12 +55,6 @@ interface IGuildCredential {
     /// @param guildAction The action to check via the oracle.
     /// @param guildId The id the token has been claimed for.
     event Claimed(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
-
-    /// @notice Event emitted whenever a claim is requested.
-    /// @param receiver The address that receives the tokens.
-    /// @param guildAction The action that has been checked via the oracle.
-    /// @param guildId The id to claim the token for.
-    event ClaimRequested(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
 
     /// @notice Event emitted whenever a token's cid is updated.
     /// @param tokenId The id of the updated token.
