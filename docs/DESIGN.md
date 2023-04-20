@@ -23,9 +23,11 @@ The server runs either a separate service or it's a part of Guild's [core](https
 - the server:
   - checks the access (probably an api call to the core or direct db access)
   - generates the metadata and uploads/pins it on IPFS
-  - signs the transaction data using a private key and returns the signature alongside the cid
+  - signs the transaction data + current timestamp (unix seconds) using a private key
+  - returns the timestamp, the cid and the signature
 - the user initiates a transaction to the contract. Supplies the signed data, the signature and the fee
 - the contract:
+  - checks the timestamp (reverts if it's older than 1 hour)
   - verifies the signature (reverts if it's invalid)
   - updates the claimedTokens mapping
   - sends the fee to the treasury
