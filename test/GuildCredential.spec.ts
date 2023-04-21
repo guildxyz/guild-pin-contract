@@ -24,6 +24,7 @@ let credential: Contract;
 let wallet0: SignerWithAddress;
 let randomWallet: SignerWithAddress;
 let treasury: SignerWithAddress;
+let signer: SignerWithAddress;
 
 enum GuildAction {
   JOINED_GUILD,
@@ -33,7 +34,7 @@ enum GuildAction {
 
 describe("GuildCredential", () => {
   before("get accounts", async () => {
-    [wallet0, randomWallet, treasury] = await ethers.getSigners();
+    [wallet0, randomWallet, treasury, signer] = await ethers.getSigners();
 
     const ERC20 = await ethers.getContractFactory("MockERC20");
     mockERC20 = await ERC20.deploy("Mock Token", "MCK");
@@ -42,7 +43,7 @@ describe("GuildCredential", () => {
 
   beforeEach("deploy contract", async () => {
     GuildCredential = await ethers.getContractFactory("GuildCredential");
-    credential = await upgrades.deployProxy(GuildCredential, [name, symbol, treasury.address], {
+    credential = await upgrades.deployProxy(GuildCredential, [name, symbol, treasury.address, signer.address], {
       kind: "uups"
     });
     await credential.deployed();

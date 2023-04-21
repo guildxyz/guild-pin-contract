@@ -1,7 +1,6 @@
 import { ethers, upgrades } from "hardhat";
 
-// The address where the contract was deployed (proxy)
-const credentialAddress = "0x...";
+const credentialAddress = "0x..."; // The address where the contract was deployed (proxy).
 
 async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
