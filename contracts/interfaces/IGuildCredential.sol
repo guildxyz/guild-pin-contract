@@ -21,6 +21,9 @@ interface IGuildCredential {
     /// @return count The number of NFTs.
     function totalSupply() external view returns (uint256 count);
 
+    /// @return signer The address that signs the metadata.
+    function validSigner() external view returns (address signer);
+
     /// @notice Claims tokens to the given address.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
     /// @param receiver The address that receives the token.
@@ -60,8 +63,15 @@ interface IGuildCredential {
     /// @param tokenId The id of the updated token.
     event TokenURIUpdated(uint256 tokenId);
 
+    /// @notice Event emitted when the validSigner is changed.
+    /// @param newValidSigner The new address of validSigner.
+    event ValidSignerChanged(address newValidSigner);
+
     /// @notice Error thrown when the token is already claimed.
     error AlreadyClaimed();
+
+    /// @notice Error thrown when the signature is already expired.
+    error ExpiredSignature();
 
     /// @notice Error thrown when an incorrect amount of fee is attempted to be paid.
     /// @param paid The amount of funds received.
@@ -75,6 +85,9 @@ interface IGuildCredential {
 
     /// @notice Error thrown when the sender is not permitted to do a specific action.
     error IncorrectSender();
+
+    /// @notice Error thrown when the supplied signature is invalid.
+    error IncorrectSignature();
 
     /// @notice Error thrown when trying to query info about a token that's not (yet) minted.
     /// @param tokenId The queried id.
