@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 /// @title An NFT representing actions taken by Guild.xyz users.
 interface IGuildCredential {
-    /// @notice Actions that can be checked via the oracle.
+    /// @notice Actions taken on Guild that can be rewarded with a credential.
     enum GuildAction {
         JOINED_GUILD,
         IS_OWNER,
@@ -12,7 +12,7 @@ interface IGuildCredential {
 
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
-    /// @param guildAction The action which has been checked via the oracle.
+    /// @param guildAction The action the credential was minted for.
     /// @param id The id of the guild or role the token was minted for.
     /// @return claimed Whether the address has claimed their token.
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed);
@@ -33,7 +33,7 @@ interface IGuildCredential {
     /// @dev The contract needs to be approved if ERC20 tokens are used.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
     /// @param receiver The address that receives the token.
-    /// @param guildAction The action to check via the oracle.
+    /// @param guildAction The action the credential is minted for.
     /// @param guildId The id to claim the token for.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
@@ -55,13 +55,24 @@ interface IGuildCredential {
 
     /// @notice Updates a minted token's URI.
     /// @dev Only callable by the owner of the token.
-    /// @param tokenId The id of the token to be updated.
+    /// @param tokenOwner The address that receives the token.
+    /// @param guildAction The action the credential was minted for.
+    /// @param guildId The id to claim the token for.
+    /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated metadata.
-    function updateTokenURI(uint256 tokenId, string memory newCid) external;
+    /// @param signature The above parameters signed by validSigner.
+    function updateTokenURI(
+        address tokenOwner,
+        GuildAction guildAction,
+        uint256 guildId,
+        uint256 signedAt,
+        string calldata newCid,
+        bytes calldata signature
+    ) external;
 
     /// @notice Event emitted whenever a claim succeeds (is fulfilled).
     /// @param receiver The address that received the tokens.
-    /// @param guildAction The action to check via the oracle.
+    /// @param guildAction The action the credential was minted for.
     /// @param guildId The id the token has been claimed for.
     event Claimed(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
 

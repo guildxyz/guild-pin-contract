@@ -37,7 +37,7 @@ contract GuildCredential is
     /// @notice Empty space reserved for future updates.
     uint256[46] private __gap;
 
-    /// @notice Sets metadata and the oracle details.
+    /// @notice Sets metadata and the associated addresses.
     /// @param name The name of the token.
     /// @param symbol The symbol of the token.
     /// @param treasury The address where the collected fees will be sent.
@@ -108,11 +108,20 @@ contract GuildCredential is
         emit ValidSignerChanged(newValidSigner);
     }
 
-    // TODO: remove or add signature validation here
-    function updateTokenURI(uint256 tokenId, string calldata newCid) external {
-        address owner = _ownerOf(tokenId);
-        if (owner == address(0)) revert NonExistentToken(tokenId);
-        if (owner != msg.sender) revert IncorrectSender();
+    function updateTokenURI(
+        address tokenOwner,
+        GuildAction guildAction,
+        uint256 guildId,
+        uint256 signedAt,
+        string calldata newCid,
+        bytes calldata signature
+    ) external {
+        if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
+        if (!isValidSignature(tokenOwner, guildAction, guildId, signedAt, newCid, signature))
+            revert IncorrectSignature();
+
+        uint256 tokenId = claimedTokens[tokenOwner][guildAction][guildId];
+        if (tokenId == 0) revert NonExistentToken(tokenId);
 
         cids[tokenId] = newCid;
 

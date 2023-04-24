@@ -185,7 +185,7 @@ describe("GuildCredential", () => {
           wallet0.address,
           GuildAction.JOINED_GUILD,
           1985,
-          timestamp,
+          oldTimestamp,
           cids[0]
         );
         await expect(
@@ -625,29 +625,86 @@ describe("GuildCredential", () => {
         );
       });
 
-      it("should revert if the token is not yet minted", async () => {
-        await expect(credential.updateTokenURI(2, cids[1]))
-          .to.be.revertedWithCustomError(credential, "NonExistentToken")
-          .withArgs(2);
+      it("should revert if the signature is expired", async () => {
+        const validity = await credential.SIGNATURE_VALIDITY();
+        const oldTimestamp = Math.floor(Date.now() / 1000) - validity - 10;
+        await expect(
+          credential.updateTokenURI(wallet0.address, GuildAction.JOINED_GUILD, 1985, oldTimestamp, cids[0], signature)
+        ).to.be.revertedWithCustomError(credential, "ExpiredSignature");
       });
 
-      it("should revert if the sender is not the token owner", async () => {
-        await expect(credential.connect(randomWallet).updateTokenURI(1, cids[1])).to.be.revertedWithCustomError(
-          credential,
-          "IncorrectSender"
+      it("should revert if the signature is incorrect", async () => {
+        await expect(
+          credential.updateTokenURI(
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            constants.HashZero
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+
+        await expect(
+          credential.updateTokenURI(
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            signature.slice(0, -2)
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+
+        await expect(
+          credential.updateTokenURI(
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            await createSignature(signer, wallet0.address, GuildAction.IS_ADMIN, 1985, timestamp, cids[0])
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+      });
+
+      it("should revert if the token is not yet minted", async () => {
+        const altSignature = await createSignature(
+          signer,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          1986,
+          timestamp,
+          cids[0]
         );
+        await expect(
+          credential.updateTokenURI(wallet0.address, GuildAction.JOINED_GUILD, 1986, timestamp, cids[0], altSignature)
+        )
+          .to.be.revertedWithCustomError(credential, "NonExistentToken")
+          .withArgs(0);
       });
 
       it("should update cid", async () => {
         const oldTokenURI = await credential.tokenURI(1);
-        await credential.updateTokenURI(1, cids[1]);
+        await credential.updateTokenURI(
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          1985,
+          timestamp,
+          cids[1],
+          await createSignature(signer, wallet0.address, GuildAction.JOINED_GUILD, 1985, timestamp, cids[1])
+        );
         const newTokenURI = await credential.tokenURI(1);
         expect(newTokenURI).to.not.eq(oldTokenURI);
         expect(newTokenURI).to.contain(cids[1]);
       });
 
       it("should emit TokenURIUpdated event", async () => {
-        await expect(credential.updateTokenURI(1, cids[1])).to.emit(credential, "TokenURIUpdated").withArgs(1);
+        await expect(
+          credential.updateTokenURI(wallet0.address, GuildAction.JOINED_GUILD, 1985, timestamp, cids[0], signature)
+        )
+          .to.emit(credential, "TokenURIUpdated")
+          .withArgs(1);
       });
     });
   });

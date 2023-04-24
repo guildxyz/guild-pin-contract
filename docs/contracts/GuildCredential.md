@@ -68,7 +68,7 @@ function initialize(
 ) public
 ```
 
-Sets metadata and the oracle details.
+Sets metadata and the associated addresses.
 
 #### Parameters
 
@@ -103,7 +103,7 @@ The contract needs to be approved if ERC20 tokens are used.
 | :--- | :--- | :---------- |
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
 | `receiver` | address | The address that receives the token. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential is minted for. |
 | `guildId` | uint256 | The id to claim the token for. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
@@ -145,8 +145,12 @@ function setValidSigner(
 
 ```solidity
 function updateTokenURI(
-    uint256 tokenId,
-    string newCid
+    address tokenOwner,
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 guildId,
+    uint256 signedAt,
+    string newCid,
+    bytes signature
 ) external
 ```
 
@@ -158,8 +162,12 @@ Only callable by the owner of the token.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the token to be updated. |
+| `tokenOwner` | address | The address that receives the token. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
+| `guildId` | uint256 | The id to claim the token for. |
+| `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `newCid` | string | The new cid that points to the updated metadata. |
+| `signature` | bytes | The above parameters signed by validSigner. |
 
 ### hasClaimed
 
@@ -178,7 +186,7 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `account` | address | The user's address. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action which has been checked via the oracle. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
 | `id` | uint256 | The id of the guild or role the token was minted for. |
 
 #### Return Values
