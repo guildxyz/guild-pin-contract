@@ -141,7 +141,7 @@ contract GuildCredential is
         bytes calldata signature
     ) internal view returns (bool) {
         if (signature.length != 65) revert IncorrectSignature();
-        bytes32 message = keccak256(abi.encodePacked(receiver, guildAction, guildId, signedAt, cid));
+        bytes32 message = keccak256(abi.encode(receiver, guildAction, guildId, signedAt, cid)).toEthSignedMessageHash();
         return message.recover(signature) == validSigner;
     }
 }
