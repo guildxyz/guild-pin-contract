@@ -65,7 +65,7 @@ contract GuildCredential is
         bytes calldata signature
     ) external payable {
         if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
-        if (claimedTokens[msg.sender][guildAction][guildId] != 0) revert AlreadyClaimed();
+        if (claimedTokens[receiver][guildAction][guildId] != 0) revert AlreadyClaimed();
         if (!isValidSignature(receiver, guildAction, guildId, signedAt, cid, signature)) revert IncorrectSignature();
 
         uint256 fee = fee[payToken];
@@ -73,7 +73,7 @@ contract GuildCredential is
 
         uint256 tokenId = totalSupply + 1;
 
-        claimedTokens[receiver][guildAction][tokenId] = tokenId;
+        claimedTokens[receiver][guildAction][guildId] = tokenId;
         cids[tokenId] = cid;
 
         // Fee collection
