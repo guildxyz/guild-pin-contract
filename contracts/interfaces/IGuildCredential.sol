@@ -25,6 +25,7 @@ interface IGuildCredential {
     function validSigner() external view returns (address signer);
 
     /// @notice Claims tokens to the given address.
+    /// @dev The contract needs to be approved if ERC20 tokens are used.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
     /// @param receiver The address that receives the token.
     /// @param guildAction The action to check via the oracle.
