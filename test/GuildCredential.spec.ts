@@ -411,6 +411,28 @@ describe("GuildCredential", () => {
         expect(res2.status).to.equal(1);
       });
 
+      it("should revert when an ERC20 transfer silently fails", async () => {
+        const BadERC20 = await ethers.getContractFactory("MockBadERC20");
+        const mockBadERC20 = await BadERC20.deploy("Mock Token", "MCK");
+        mockBadERC20.mint(wallet0.address, ethers.utils.parseEther("100"));
+        await mockBadERC20.approve(credential.address, constants.MaxUint256);
+        credential.setFee(mockBadERC20.address, fee);
+
+        await expect(
+          credential.claim(
+            mockBadERC20.address,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            sampleSignature
+          )
+        )
+          .to.be.revertedWithCustomError(credential, "TransferFailed")
+          .withArgs(wallet0.address, credential.address);
+      });
+
       it("should transfer ERC20 when there is no msg.value", async () => {
         await mockERC20.approve(credential.address, constants.MaxUint256);
         await expect(
