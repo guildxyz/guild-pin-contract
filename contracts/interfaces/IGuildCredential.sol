@@ -17,6 +17,11 @@ interface IGuildCredential {
     /// @return claimed Whether the address has claimed their token.
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed);
 
+    /// @notice The time interval while a signature is valid.
+    /// @return validity The time interval in seconds.
+    // solhint-disable func-name-mixedcase
+    function SIGNATURE_VALIDITY() external pure returns (uint256 validity);
+
     /// @notice The total amount of tokens in existence.
     /// @return count The number of NFTs.
     function totalSupply() external view returns (uint256 count);

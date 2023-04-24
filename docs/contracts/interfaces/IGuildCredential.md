@@ -29,6 +29,19 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `claimed` | bool | Whether the address has claimed their token. |
+### SIGNATURE_VALIDITY
+
+```solidity
+function SIGNATURE_VALIDITY() external returns (uint256 validity)
+```
+
+The time interval while a signature is valid.
+
+#### Return Values
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `validity` | uint256 | The time interval in seconds. |
 ### totalSupply
 
 ```solidity

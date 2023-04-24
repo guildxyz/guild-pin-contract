@@ -10,6 +10,13 @@ An NFT representing actions taken by Guild.xyz users.
 uint256 SIGNATURE_VALIDITY
 ```
 
+The time interval while a signature is valid.
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+
 ### totalSupply
 
 ```solidity
