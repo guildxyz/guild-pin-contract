@@ -73,6 +73,7 @@ describe("GuildCredential", () => {
     expect(await credential.symbol()).to.eq(symbol);
     expect(await credential.owner()).to.eq(wallet0.address);
     expect(await credential.treasury()).to.eq(treasury.address);
+    expect(await credential.validSigner()).to.eq(signer.address);
   });
 
   it("should be upgradeable", async () => {
@@ -115,7 +116,7 @@ describe("GuildCredential", () => {
 
   context("Treasury management", () => {
     context("#setFee", () => {
-      it("should fail if a token's fee is attempted to be changed by anyone but the owner", async () => {
+      it("should revert if a token's fee is attempted to be changed by anyone but the owner", async () => {
         await expect(credential.connect(randomWallet).setFee(constants.AddressZero, 12)).to.be.revertedWith(
           "Ownable: caller is not the owner"
         );
@@ -137,7 +138,7 @@ describe("GuildCredential", () => {
     });
 
     context("#setTreasury", () => {
-      it("should fail if the treasury is attempted to be changed by anyone but the owner", async () => {
+      it("should revert if the treasury is attempted to be changed by anyone but the owner", async () => {
         await expect(credential.connect(randomWallet).setTreasury(randomWallet.address)).to.be.revertedWith(
           "Ownable: caller is not the owner"
         );
@@ -176,7 +177,32 @@ describe("GuildCredential", () => {
     });
 
     context("#claim", () => {
-      it("fails if the address has already claimed", async () => {
+      it("should revert if the signature is expired", async () => {
+        const validity = await credential.SIGNATURE_VALIDITY();
+        const oldTimestamp = Math.floor(Date.now() / 1000) - validity - 10;
+        const signature = await createSignature(
+          signer,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          1985,
+          timestamp,
+          cids[0]
+        );
+        await expect(
+          credential.claim(
+            constants.AddressZero,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            oldTimestamp,
+            cids[0],
+            signature,
+            { value: fee }
+          )
+        ).to.be.revertedWithCustomError(credential, "ExpiredSignature");
+      });
+
+      it("should revert if the address has already claimed", async () => {
         await credential.claim(
           constants.AddressZero,
           wallet0.address,
@@ -201,7 +227,48 @@ describe("GuildCredential", () => {
         ).to.be.revertedWithCustomError(credential, "AlreadyClaimed");
       });
 
-      it("fails if the token has no fees set", async () => {
+      it("should revert if the signature is incorrect", async () => {
+        await expect(
+          credential.claim(
+            constants.AddressZero,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            constants.HashZero,
+            { value: fee }
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+
+        await expect(
+          credential.claim(
+            constants.AddressZero,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            sampleSignature.slice(0, -2),
+            { value: fee }
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+
+        await expect(
+          credential.claim(
+            constants.AddressZero,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            await createSignature(signer, wallet0.address, GuildAction.IS_ADMIN, 1985, timestamp, cids[0]),
+            { value: fee }
+          )
+        ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
+      });
+
+      it("should revert if the token has no fees set", async () => {
         await expect(
           credential.claim(
             randomWallet.address,
@@ -215,6 +282,36 @@ describe("GuildCredential", () => {
         )
           .to.be.revertedWithCustomError(credential, "IncorrectPayToken")
           .withArgs(randomWallet.address);
+      });
+
+      it("should increment the total supply", async () => {
+        const totalSupply0 = await credential.totalSupply();
+        await credential.claim(
+          constants.AddressZero,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          1985,
+          timestamp,
+          cids[0],
+          sampleSignature,
+          { value: fee }
+        );
+        const totalSupply1 = await credential.totalSupply();
+        expect(totalSupply1).to.eq(totalSupply0.add(1));
+      });
+
+      it("should set the address's claim status", async () => {
+        await credential.claim(
+          constants.AddressZero,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          1985,
+          timestamp,
+          cids[0],
+          sampleSignature,
+          { value: fee }
+        );
+        expect(await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985)).to.eq(true);
       });
 
       it("should be able to mint tokens for the same reason to different addresses", async () => {
@@ -329,21 +426,6 @@ describe("GuildCredential", () => {
         ).to.changeTokenBalances(mockERC20, [wallet0, treasury], [fee.mul(-1), fee]);
       });
 
-      it("should transfer ether to treasury", async () => {
-        await expect(
-          credential.claim(
-            constants.AddressZero,
-            wallet0.address,
-            GuildAction.JOINED_GUILD,
-            1985,
-            timestamp,
-            cids[0],
-            sampleSignature,
-            { value: fee }
-          )
-        ).to.changeEtherBalances([wallet0, treasury], [fee.mul(-1), fee]);
-      });
-
       it("should revert if an incorrect msg.value is received", async () => {
         await expect(
           credential.claim(
@@ -359,6 +441,7 @@ describe("GuildCredential", () => {
         )
           .to.be.revertedWithCustomError(credential, "IncorrectFee")
           .withArgs(fee.mul(2), fee);
+
         await expect(
           credential.claim(
             constants.AddressZero,
@@ -375,34 +458,19 @@ describe("GuildCredential", () => {
           .withArgs(fee.div(2), fee);
       });
 
-      it("should set the address's claim status", async () => {
-        await credential.claim(
-          constants.AddressZero,
-          wallet0.address,
-          GuildAction.JOINED_GUILD,
-          1985,
-          timestamp,
-          cids[0],
-          sampleSignature,
-          { value: fee }
-        );
-        expect(await credential.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, 1985)).to.eq(true);
-      });
-
-      it("should increment the total supply", async () => {
-        const totalSupply0 = await credential.totalSupply();
-        await credential.claim(
-          constants.AddressZero,
-          wallet0.address,
-          GuildAction.JOINED_GUILD,
-          1985,
-          timestamp,
-          cids[0],
-          sampleSignature,
-          { value: fee }
-        );
-        const totalSupply1 = await credential.totalSupply();
-        expect(totalSupply1).to.eq(totalSupply0.add(1));
+      it("should transfer ether to treasury", async () => {
+        await expect(
+          credential.claim(
+            constants.AddressZero,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            1985,
+            timestamp,
+            cids[0],
+            sampleSignature,
+            { value: fee }
+          )
+        ).to.changeEtherBalances([wallet0, treasury], [fee.mul(-1), fee]);
       });
 
       it("should mint the token", async () => {
@@ -424,7 +492,7 @@ describe("GuildCredential", () => {
         expect(await credential.ownerOf(tokenId)).to.eq(wallet0.address);
       });
 
-      it("emits Claimed event", async () => {
+      it("should emit Claimed event", async () => {
         await expect(
           credential.claim(
             constants.AddressZero,
@@ -471,7 +539,7 @@ describe("GuildCredential", () => {
         expect(totalSupply1).to.eq(totalSupply0.sub(1));
       });
 
-      it("burns the token", async () => {
+      it("should burn the token", async () => {
         await expect(credential.burn(GuildAction.JOINED_GUILD, 1985)).to.changeTokenBalance(credential, wallet0, -1);
       });
     });
@@ -535,13 +603,13 @@ describe("GuildCredential", () => {
         );
       });
 
-      it("fails if the token is not yet minted", async () => {
+      it("should revert if the token is not yet minted", async () => {
         await expect(credential.updateTokenURI(2, cids[1]))
           .to.be.revertedWithCustomError(credential, "NonExistentToken")
           .withArgs(2);
       });
 
-      it("fails if the sender is not the owner", async () => {
+      it("should revert if the sender is not the token owner", async () => {
         await expect(credential.connect(randomWallet).updateTokenURI(1, cids[1])).to.be.revertedWithCustomError(
           credential,
           "IncorrectSender"
@@ -556,9 +624,31 @@ describe("GuildCredential", () => {
         expect(newTokenURI).to.contain(cids[1]);
       });
 
-      it("emits TokenURIUpdated event", async () => {
+      it("should emit TokenURIUpdated event", async () => {
         await expect(credential.updateTokenURI(1, cids[1])).to.emit(credential, "TokenURIUpdated").withArgs(1);
       });
+    });
+  });
+
+  context("#setValidSigner", () => {
+    it("should revert if the valid signer is attempted to be changed by anyone but the owner", async () => {
+      await expect(credential.connect(randomWallet).setValidSigner(randomWallet.address)).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("should change the valid signer's address", async () => {
+      const validSigner0 = await credential.validSigner();
+      await credential.setValidSigner(randomWallet.address);
+      const validSigner1 = await credential.validSigner();
+      expect(validSigner1).to.not.eq(validSigner0);
+      expect(validSigner1).to.eq(randomWallet.address);
+    });
+
+    it("should emit ValidSignerChanged event", async () => {
+      await expect(credential.setValidSigner(randomWallet.address))
+        .to.emit(credential, "ValidSignerChanged")
+        .withArgs(randomWallet.address);
     });
   });
 });
