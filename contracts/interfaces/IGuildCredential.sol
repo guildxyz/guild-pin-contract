@@ -29,7 +29,7 @@ interface IGuildCredential {
     /// @param receiver The address that receives the token.
     /// @param guildAction The action to check via the oracle.
     /// @param guildId The id to claim the token for.
-    /// @param expirationTimestamp The signature is valid until then.
+    /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
     /// @param signature The above parameters (except the payToken) signed by validSigner.
     function claim(
@@ -37,7 +37,7 @@ interface IGuildCredential {
         address receiver,
         GuildAction guildAction,
         uint256 guildId,
-        uint256 expirationTimestamp,
+        uint256 signedAt,
         string calldata cid,
         bytes calldata signature
     ) external payable;

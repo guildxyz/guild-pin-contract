@@ -60,14 +60,13 @@ contract GuildCredential is
         address receiver,
         GuildAction guildAction,
         uint256 guildId,
-        uint256 expirationTimestamp,
+        uint256 signedAt,
         string calldata cid,
         bytes calldata signature
     ) external payable {
-        if (expirationTimestamp > block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
+        if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
         if (claimedTokens[msg.sender][guildAction][guildId] != 0) revert AlreadyClaimed();
-        if (!isValidSignature(receiver, guildAction, guildId, expirationTimestamp, cid, signature))
-            revert IncorrectSignature();
+        if (!isValidSignature(receiver, guildAction, guildId, signedAt, cid, signature)) revert IncorrectSignature();
 
         uint256 fee = fee[payToken];
         if (fee == 0) revert IncorrectPayToken(payToken);
@@ -137,12 +136,12 @@ contract GuildCredential is
         address receiver,
         GuildAction guildAction,
         uint256 guildId,
-        uint256 expirationTimestamp,
+        uint256 signedAt,
         string calldata cid,
         bytes calldata signature
     ) internal view returns (bool) {
         if (signature.length != 65) revert IncorrectSignature();
-        bytes32 message = keccak256(abi.encodePacked(receiver, guildAction, guildId, expirationTimestamp, cid));
+        bytes32 message = keccak256(abi.encodePacked(receiver, guildAction, guildId, signedAt, cid));
         return message.recover(signature) == validSigner;
     }
 }
