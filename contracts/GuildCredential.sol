@@ -72,6 +72,9 @@ contract GuildCredential is
         if (fee == 0) revert IncorrectPayToken(payToken);
 
         uint256 tokenId = totalSupply + 1;
+        unchecked {
+            ++totalSupply;
+        }
 
         claimedTokens[receiver][guildAction][guildId] = tokenId;
         cids[tokenId] = cid;
@@ -82,9 +85,6 @@ contract GuildCredential is
         if (msg.value == 0) treasury.sendTokenFrom(msg.sender, payToken, fee);
         else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
         else treasury.sendEther(fee);
-        unchecked {
-            ++totalSupply;
-        }
 
         _safeMint(receiver, tokenId);
 
