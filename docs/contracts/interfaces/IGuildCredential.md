@@ -42,27 +42,46 @@ The total amount of tokens in existence.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `count` | uint256 | The number of NFTs. |
+### validSigner
+
+```solidity
+function validSigner() external returns (address signer)
+```
+
+#### Return Values
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `signer` | address | The address that signs the metadata. |
 ### claim
 
 ```solidity
 function claim(
     address payToken,
+    address receiver,
     enum IGuildCredential.GuildAction guildAction,
     uint256 guildId,
-    string cid
+    uint256 signedAt,
+    string cid,
+    bytes signature
 ) external
 ```
 
 Claims tokens to the given address.
+
+The contract needs to be approved if ERC20 tokens are used.
 
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
+| `receiver` | address | The address that receives the token. |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
 | `guildId` | uint256 | The id to claim the token for. |
+| `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
+| `signature` | bytes | The above parameters (except the payToken) signed by validSigner. |
 
 ### burn
 
@@ -123,25 +142,6 @@ Event emitted whenever a claim succeeds (is fulfilled).
 | `receiver` | address | The address that received the tokens. |
 | `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
 | `guildId` | uint256 | The id the token has been claimed for. |
-### ClaimRequested
-
-```solidity
-event ClaimRequested(
-    address receiver,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId
-)
-```
-
-Event emitted whenever a claim is requested.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `receiver` | address | The address that receives the tokens. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action that has been checked via the oracle. |
-| `guildId` | uint256 | The id to claim the token for. |
 ### TokenURIUpdated
 
 ```solidity
@@ -157,6 +157,21 @@ Event emitted whenever a token's cid is updated.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `tokenId` | uint256 | The id of the updated token. |
+### ValidSignerChanged
+
+```solidity
+event ValidSignerChanged(
+    address newValidSigner
+)
+```
+
+Event emitted when the validSigner is changed.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `newValidSigner` | address | The new address of validSigner. |
 
 ## Custom errors
 
@@ -167,6 +182,14 @@ error AlreadyClaimed()
 ```
 
 Error thrown when the token is already claimed.
+
+### ExpiredSignature
+
+```solidity
+error ExpiredSignature()
+```
+
+Error thrown when the signature is already expired.
 
 ### IncorrectFee
 
@@ -206,6 +229,14 @@ error IncorrectSender()
 ```
 
 Error thrown when the sender is not permitted to do a specific action.
+
+### IncorrectSignature
+
+```solidity
+error IncorrectSignature()
+```
+
+Error thrown when the supplied signature is invalid.
 
 ### NonExistentToken
 
