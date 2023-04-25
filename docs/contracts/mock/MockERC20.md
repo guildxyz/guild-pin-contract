@@ -1,8 +1,8 @@
 # MockERC20
 
-A mintable and burnable ERC20 token.
+A mintable and burnable ERC20 token, used only for tests.
 
-Use only for tests.
+Do not use this in production.
 
 ## Functions
 

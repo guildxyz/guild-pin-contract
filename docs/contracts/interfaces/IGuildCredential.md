@@ -154,7 +154,7 @@ event Claimed(
 )
 ```
 
-Event emitted whenever a claim succeeds (is fulfilled).
+Event emitted whenever a claim succeeds.
 
 #### Parameters
 

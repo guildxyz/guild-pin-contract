@@ -70,7 +70,7 @@ interface IGuildCredential {
         bytes calldata signature
     ) external;
 
-    /// @notice Event emitted whenever a claim succeeds (is fulfilled).
+    /// @notice Event emitted whenever a claim succeeds.
     /// @param receiver The address that received the tokens.
     /// @param guildAction The action the credential was minted for.
     /// @param guildId The id the token has been claimed for.

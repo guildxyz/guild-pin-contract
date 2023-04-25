@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-/// @title A mintable and burnable ERC20 token.
-/// @dev Use only for tests.
+/// @title A mintable and burnable ERC20 token, used only for tests.
+/// @dev Do not use this in production.
 contract MockERC20 is ERC20 {
     /// @notice Sets metadata.
     /// @param name The name of the token.
