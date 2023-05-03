@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
-  docgen: { pages: "files", templates: "./docs/templates" }
+  docgen: { pages: "files", outputDir: "./docs/contracts", templates: "./docs/templates" }
 };
 
 export default config;
