@@ -114,6 +114,37 @@ describe("GuildCredential", () => {
     ).to.be.revertedWithCustomError(GuildCredential, "Soulbound");
   });
 
+  it("should return all token ids owned by an address", async () => {
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < cids.length; i += 1) {
+      const signaturei = await createSignature(
+        signer,
+        wallet0.address,
+        GuildAction.JOINED_GUILD,
+        1985 + i,
+        timestamp,
+        cids[i]
+      );
+      await credential.claim(
+        constants.AddressZero,
+        wallet0.address,
+        GuildAction.JOINED_GUILD,
+        1985 + i,
+        timestamp,
+        cids[i],
+        signaturei,
+        {
+          value: fee
+        }
+      );
+    }
+    /* eslint-enable no-await-in-loop */
+
+    expect(await credential.tokensOfOwner(wallet0.address)).to.deep.eq([1, 2, 3, 4, 5]);
+  });
+
   context("Treasury management", () => {
     context("#setFee", () => {
       it("should revert if a token's fee is attempted to be changed by anyone but the owner", async () => {
