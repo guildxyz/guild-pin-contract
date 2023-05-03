@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+/* solhint-disable max-line-length */
 
-/// @title A simple, soulbound ERC721.
+import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import { IERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import { ERC721EnumerableUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import { IERC721EnumerableUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol";
+
+/* solhint-enable max-line-length */
+
+/// @title An enumerable soulbound ERC721.
 /// @notice Allowance and transfer-related functions are disabled.
-contract SoulboundERC721 is ERC721Upgradeable {
+contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable {
     /// @notice Empty space reserved for future updates.
     uint256[50] private __gap;
 
@@ -15,25 +22,50 @@ contract SoulboundERC721 is ERC721Upgradeable {
     // solhint-disable-next-line func-name-mixedcase
     function __SoulboundERC721_init(string memory name_, string memory symbol_) internal onlyInitializing {
         __ERC721_init(name_, symbol_);
+        __ERC721Enumerable_init();
     }
 
-    function approve(address /* to */, uint256 /* tokenId */) public virtual override {
+    /// @inheritdoc ERC721EnumerableUpgradeable
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC721EnumerableUpgradeable, ERC721Upgradeable) returns (bool) {
+        return interfaceId == type(IERC721EnumerableUpgradeable).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    function approve(
+        address /* to */,
+        uint256 /* tokenId */
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         revert Soulbound();
     }
 
-    function setApprovalForAll(address /* operator */, bool /* approved */) public virtual override {
+    function setApprovalForAll(
+        address /* operator */,
+        bool /* approved */
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         revert Soulbound();
     }
 
-    function isApprovedForAll(address /* owner */, address /* operator */) public view virtual override returns (bool) {
+    function isApprovedForAll(
+        address /* owner */,
+        address /* operator */
+    ) public view virtual override(IERC721Upgradeable, ERC721Upgradeable) returns (bool) {
         revert Soulbound();
     }
 
-    function transferFrom(address /* from */, address /* to */, uint256 /* tokenId */) public virtual override {
+    function transferFrom(
+        address /* from */,
+        address /* to */,
+        uint256 /* tokenId */
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         revert Soulbound();
     }
 
-    function safeTransferFrom(address /* from */, address /* to */, uint256 /* tokenId */) public virtual override {
+    function safeTransferFrom(
+        address /* from */,
+        address /* to */,
+        uint256 /* tokenId */
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         revert Soulbound();
     }
 
@@ -42,7 +74,17 @@ contract SoulboundERC721 is ERC721Upgradeable {
         address /* to */,
         uint256 /* tokenId */,
         bytes memory /* data */
-    ) public virtual override {
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         revert Soulbound();
+    }
+
+    /// @dev Still used for minting/burning.
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    ) internal virtual override(ERC721EnumerableUpgradeable, ERC721Upgradeable) {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
     }
 }

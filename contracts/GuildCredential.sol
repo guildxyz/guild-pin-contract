@@ -26,7 +26,6 @@ contract GuildCredential is
     using LibTransfer for address payable;
 
     uint256 public constant SIGNATURE_VALIDITY = 1 hours;
-    uint256 public totalSupply;
     address public validSigner;
 
     /// @notice Mapping tokenIds to cids (for tokenURIs).
@@ -35,7 +34,7 @@ contract GuildCredential is
     mapping(address => mapping(GuildAction => mapping(uint256 => uint256))) internal claimedTokens;
 
     /// @notice Empty space reserved for future updates.
-    uint256[46] private __gap;
+    uint256[47] private __gap;
 
     /// @notice Sets metadata and the associated addresses.
     /// @param name The name of the token.
@@ -71,10 +70,7 @@ contract GuildCredential is
         uint256 fee = fee[payToken];
         if (fee == 0) revert IncorrectPayToken(payToken);
 
-        uint256 tokenId = totalSupply + 1;
-        unchecked {
-            ++totalSupply;
-        }
+        uint256 tokenId = totalSupply() + 1;
 
         claimedTokens[receiver][guildAction][guildId] = tokenId;
         cids[tokenId] = cid;
@@ -96,9 +92,6 @@ contract GuildCredential is
 
         claimedTokens[msg.sender][guildAction][guildId] = 0;
         delete cids[tokenId];
-        unchecked {
-            --totalSupply;
-        }
 
         _burn(tokenId);
     }

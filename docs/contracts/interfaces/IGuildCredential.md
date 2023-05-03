@@ -42,19 +42,6 @@ The time interval while a signature is valid.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `validity` | uint256 | The time interval in seconds. |
-### totalSupply
-
-```solidity
-function totalSupply() external returns (uint256 count)
-```
-
-The total amount of tokens in existence.
-
-#### Return Values
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `count` | uint256 | The number of NFTs. |
 ### validSigner
 
 ```solidity

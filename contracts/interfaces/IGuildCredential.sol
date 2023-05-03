@@ -22,10 +22,6 @@ interface IGuildCredential {
     // solhint-disable func-name-mixedcase
     function SIGNATURE_VALIDITY() external pure returns (uint256 validity);
 
-    /// @notice The total amount of tokens in existence.
-    /// @return count The number of NFTs.
-    function totalSupply() external view returns (uint256 count);
-
     /// @return signer The address that signs the metadata.
     function validSigner() external view returns (address signer);
 

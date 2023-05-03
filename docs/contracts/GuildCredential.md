@@ -17,19 +17,6 @@ The time interval while a signature is valid.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 
-### totalSupply
-
-```solidity
-uint256 totalSupply
-```
-
-The total amount of tokens in existence.
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-
 ### validSigner
 
 ```solidity
