@@ -1,6 +1,6 @@
 # SoulboundERC721
 
-A simple, soulbound ERC721.
+An enumerable soulbound ERC721.
 
 Allowance and transfer-related functions are disabled.
 
@@ -21,6 +21,22 @@ function __SoulboundERC721_init(
 | :--- | :--- | :---------- |
 | `name_` | string |  |
 | `symbol_` | string |  |
+
+### supportsInterface
+
+```solidity
+function supportsInterface(
+    bytes4 interfaceId
+) public returns (bool)
+```
+
+See {IERC165-supportsInterface}.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `interfaceId` | bytes4 |  |
 
 ### approve
 
@@ -125,6 +141,28 @@ function safeTransferFrom(
 | `` | address |  |
 | `` | uint256 |  |
 | `` | bytes |  |
+
+### _beforeTokenTransfer
+
+```solidity
+function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 firstTokenId,
+    uint256 batchSize
+) internal
+```
+
+Still used for minting/burning.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `from` | address |  |
+| `to` | address |  |
+| `firstTokenId` | uint256 |  |
+| `batchSize` | uint256 |  |
 
 ## Custom errors
 

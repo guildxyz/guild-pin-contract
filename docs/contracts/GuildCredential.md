@@ -4,13 +4,24 @@ An NFT representing actions taken by Guild.xyz users.
 
 ## Variables
 
-### totalSupply
+### SIGNATURE_VALIDITY
 
 ```solidity
-uint256 totalSupply
+uint256 SIGNATURE_VALIDITY
 ```
 
-The total amount of tokens in existence.
+The time interval while a signature is valid.
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+
+### validSigner
+
+```solidity
+address validSigner
+```
 
 #### Return Values
 
@@ -33,37 +44,18 @@ mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 
 
 ## Functions
 
-### constructor
-
-```solidity
-constructor(
-    bytes32 jobId,
-    uint256 oracleFee
-) 
-```
-
-Sets some of the details of the oracle.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `jobId` | bytes32 | The id of the job to run on the oracle. |
-| `oracleFee` | uint256 | The amount of tokens to forward to the oracle with every request. |
-
 ### initialize
 
 ```solidity
 function initialize(
     string name,
     string symbol,
-    address linkToken,
-    address oracleAddress,
-    address payable treasury
+    address payable treasury,
+    address _validSigner
 ) public
 ```
 
-Sets metadata and the oracle details.
+Sets metadata and the associated addresses.
 
 #### Parameters
 
@@ -71,63 +63,38 @@ Sets metadata and the oracle details.
 | :--- | :--- | :---------- |
 | `name` | string | The name of the token. |
 | `symbol` | string | The symbol of the token. |
-| `linkToken` | address | The address of the Chainlink token. |
-| `oracleAddress` | address | The address of the oracle processing the requests. |
 | `treasury` | address payable | The address where the collected fees will be sent. |
-
-### _authorizeUpgrade
-
-```solidity
-function _authorizeUpgrade(
-    address 
-) internal
-```
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `` | address |  |
+| `_validSigner` | address | The address that should sign the parameters for certain functions. |
 
 ### claim
 
 ```solidity
 function claim(
     address payToken,
+    address receiver,
     enum IGuildCredential.GuildAction guildAction,
     uint256 guildId,
-    string cid
+    uint256 signedAt,
+    string cid,
+    bytes signature
 ) external
 ```
 
 Claims tokens to the given address.
+
+The contract needs to be approved if ERC20 tokens are used.
 
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action to check via the oracle. |
+| `receiver` | address | The address that receives the token. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential is minted for. |
 | `guildId` | uint256 | The id to claim the token for. |
+| `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
-
-### fulfillClaim
-
-```solidity
-function fulfillClaim(
-    bytes32 requestId,
-    uint256 access
-) public
-```
-
-The actual claim function called by the oracle if the requirements are fulfilled.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `requestId` | bytes32 |  |
-| `access` | uint256 |  |
+| `signature` | bytes | The above parameters (except the payToken) signed by validSigner. |
 
 ### burn
 
@@ -147,12 +114,30 @@ Burns a token from the sender.
 | `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
 
+### setValidSigner
+
+```solidity
+function setValidSigner(
+    address newValidSigner
+) external
+```
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `newValidSigner` | address |  |
+
 ### updateTokenURI
 
 ```solidity
 function updateTokenURI(
-    uint256 tokenId,
-    string newCid
+    address tokenOwner,
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 guildId,
+    uint256 signedAt,
+    string newCid,
+    bytes signature
 ) external
 ```
 
@@ -164,8 +149,12 @@ Only callable by the owner of the token.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the token to be updated. |
+| `tokenOwner` | address | The address that receives the token. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
+| `guildId` | uint256 | The id to claim the token for. |
+| `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `newCid` | string | The new cid that points to the updated metadata. |
+| `signature` | bytes | The above parameters signed by validSigner. |
 
 ### hasClaimed
 
@@ -184,7 +173,7 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `account` | address | The user's address. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action which has been checked via the oracle. |
+| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
 | `id` | uint256 | The id of the guild or role the token was minted for. |
 
 #### Return Values
@@ -207,4 +196,44 @@ See {IERC721Metadata-tokenURI}.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `tokenId` | uint256 |  |
+
+### _authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(
+    address 
+) internal
+```
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `` | address |  |
+
+### isValidSignature
+
+```solidity
+function isValidSignature(
+    address receiver,
+    enum IGuildCredential.GuildAction guildAction,
+    uint256 guildId,
+    uint256 signedAt,
+    string cid,
+    bytes signature
+) internal returns (bool)
+```
+
+Checks the validity of the signature for the given params.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `receiver` | address |  |
+| `guildAction` | enum IGuildCredential.GuildAction |  |
+| `guildId` | uint256 |  |
+| `signedAt` | uint256 |  |
+| `cid` | string |  |
+| `signature` | bytes |  |
 
