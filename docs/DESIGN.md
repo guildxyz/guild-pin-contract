@@ -23,9 +23,9 @@ The server-side code is a part of Guild's [core](https://github.com/agoraxyz/gui
 - the server:
   - checks the access (needs direct db access or an api call to the core in case of becoming a separate service)
   - generates the metadata and uploads/pins it on IPFS
-  - signs the transaction data + current timestamp (unix seconds) using a private key
-  - returns the timestamp, the cid and the signature
-- the user initiates a transaction to the contract. Supplies the signed data, the signature and the fee
+  - signs the input parameters, the cid and the current timestamp (unix seconds) using a private key
+  - returns the signed data alongside the signature
+- the user initiates a transaction to the contract. Supplies the data obtained from the server and the fee
 - the contract:
   - checks the timestamp (reverts if it's older than 1 hour)
   - verifies the signature (reverts if it's invalid)
