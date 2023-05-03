@@ -2,15 +2,15 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x4205e56A69a0130a9e0828D45d0c84e45340a196",
-      "txHash": "0x6b16a5cf58bdf7ffc3a34ec0a83ba9a64865bb22c47356d1ca838785cf33737b",
+      "address": "0x4aFf02D7AA6Be3eF2b1DF629e51DCc9109427A07",
+      "txHash": "0x44aebd129ef907d441703a8ab76667fd700bfde5ceeecbe4fc4b5c0a483981f6",
       "kind": "uups"
     }
   ],
   "impls": {
-    "0704d9ec832cfc0b4b28c7298b75d0ca47aeedd9041215583b3c0e285a74ee1b": {
-      "address": "0xFFfeD0e63c56944930B9Bb8aB4dEDD5F01A2879a",
-      "txHash": "0x31c56c0e469e7ae242e35af7d9840862b1a02aa330bd301c81f69123954c4d64",
+    "fc5afb26fd1b0e8d1189c18d75ab6651d750ba0a2d43ed2de31357495ebe300d": {
+      "address": "0x7aF29852cEbc51cDf62EdCabE80bDffe03b787DC",
+      "txHash": "0xfe648c3932d90ab3549b475925282c1a7dea13d4663a2709da45ff558277a888",
       "layout": {
         "solcVersion": "0.8.19",
         "storage": [
@@ -136,17 +136,57 @@
             "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:517"
           },
           {
-            "label": "__gap",
+            "label": "_ownedTokens",
             "offset": 0,
             "slot": "301",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "contract": "ERC721EnumerableUpgradeable",
+            "src": "contracts/token/ERC721Enumerable.sol:26"
+          },
+          {
+            "label": "_ownedTokensIndex",
+            "offset": 0,
+            "slot": "302",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "ERC721EnumerableUpgradeable",
+            "src": "contracts/token/ERC721Enumerable.sol:29"
+          },
+          {
+            "label": "_allTokens",
+            "offset": 0,
+            "slot": "303",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "ERC721EnumerableUpgradeable",
+            "src": "contracts/token/ERC721Enumerable.sol:32"
+          },
+          {
+            "label": "_allTokensIndex",
+            "offset": 0,
+            "slot": "304",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "ERC721EnumerableUpgradeable",
+            "src": "contracts/token/ERC721Enumerable.sol:35"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "305",
+            "type": "t_array(t_uint256)46_storage",
+            "contract": "ERC721EnumerableUpgradeable",
+            "src": "contracts/token/ERC721Enumerable.sol:183"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "351",
             "type": "t_array(t_uint256)50_storage",
             "contract": "SoulboundERC721",
-            "src": "contracts/token/SoulboundERC721.sol:10"
+            "src": "contracts/token/SoulboundERC721.sol:17"
           },
           {
             "label": "treasury",
             "offset": 0,
-            "slot": "351",
+            "slot": "401",
             "type": "t_address_payable",
             "contract": "TreasuryManager",
             "src": "contracts/utils/TreasuryManager.sol:10"
@@ -154,7 +194,7 @@
           {
             "label": "fee",
             "offset": 0,
-            "slot": "352",
+            "slot": "402",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "TreasuryManager",
             "src": "contracts/utils/TreasuryManager.sol:12"
@@ -162,50 +202,42 @@
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "353",
+            "slot": "403",
             "type": "t_array(t_uint256)48_storage",
             "contract": "TreasuryManager",
             "src": "contracts/utils/TreasuryManager.sol:15"
           },
           {
-            "label": "totalSupply",
+            "label": "validSigner",
             "offset": 0,
-            "slot": "401",
-            "type": "t_uint256",
+            "slot": "451",
+            "type": "t_address",
             "contract": "GuildCredential",
             "src": "contracts/GuildCredential.sol:29"
           },
           {
-            "label": "validSigner",
-            "offset": 0,
-            "slot": "402",
-            "type": "t_address",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:30"
-          },
-          {
             "label": "cids",
             "offset": 0,
-            "slot": "403",
+            "slot": "452",
             "type": "t_mapping(t_uint256,t_string_storage)",
             "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:33"
+            "src": "contracts/GuildCredential.sol:32"
           },
           {
             "label": "claimedTokens",
             "offset": 0,
-            "slot": "404",
-            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)4346,t_mapping(t_uint256,t_uint256)))",
+            "slot": "453",
+            "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)4368,t_mapping(t_uint256,t_uint256)))",
             "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:35"
+            "src": "contracts/GuildCredential.sol:34"
           },
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "405",
-            "type": "t_array(t_uint256)46_storage",
+            "slot": "454",
+            "type": "t_array(t_uint256)47_storage",
             "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:38"
+            "src": "contracts/GuildCredential.sol:37"
           }
         ],
         "types": {
@@ -225,6 +257,10 @@
             "label": "uint256[46]",
             "numberOfBytes": "1472"
           },
+          "t_array(t_uint256)47_storage": {
+            "label": "uint256[47]",
+            "numberOfBytes": "1504"
+          },
           "t_array(t_uint256)48_storage": {
             "label": "uint256[48]",
             "numberOfBytes": "1536"
@@ -237,11 +273,15 @@
             "label": "uint256[50]",
             "numberOfBytes": "1600"
           },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
           "t_bool": {
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_enum(GuildAction)4346": {
+          "t_enum(GuildAction)4368": {
             "label": "enum IGuildCredential.GuildAction",
             "members": [
               "JOINED_GUILD",
@@ -249,6 +289,10 @@
               "IS_ADMIN"
             ],
             "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)",
@@ -258,7 +302,7 @@
             "label": "mapping(address => mapping(address => bool))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_enum(GuildAction)4346,t_mapping(t_uint256,t_uint256)))": {
+          "t_mapping(t_address,t_mapping(t_enum(GuildAction)4368,t_mapping(t_uint256,t_uint256)))": {
             "label": "mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256)))",
             "numberOfBytes": "32"
           },
@@ -266,7 +310,7 @@
             "label": "mapping(address => uint256)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_enum(GuildAction)4346,t_mapping(t_uint256,t_uint256))": {
+          "t_mapping(t_enum(GuildAction)4368,t_mapping(t_uint256,t_uint256))": {
             "label": "mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))",
             "numberOfBytes": "32"
           },
