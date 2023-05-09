@@ -29,9 +29,10 @@ contract GuildCredential is
     address public validSigner;
 
     /// @notice Mapping tokenIds to cids (for tokenURIs).
-    mapping(uint256 => string) internal cids;
+    mapping(uint256 tokenId => string cid) internal cids;
 
-    mapping(address => mapping(GuildAction => mapping(uint256 => uint256))) internal claimedTokens;
+    mapping(address holder => mapping(GuildAction action => mapping(uint256 guildId => uint256 tokenId)))
+        internal claimedTokens;
 
     /// @notice Empty space reserved for future updates.
     uint256[47] private __gap;

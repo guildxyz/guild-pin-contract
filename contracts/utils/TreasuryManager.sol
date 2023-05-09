@@ -9,7 +9,7 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
 contract TreasuryManager is ITreasuryManager, Initializable, OwnableUpgradeable {
     address payable public treasury;
 
-    mapping(address => uint256) public fee;
+    mapping(address token => uint256 fee) public fee;
 
     /// @notice Empty space reserved for future updates.
     uint256[48] private __gap;
