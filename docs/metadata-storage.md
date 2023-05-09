@@ -1,6 +1,6 @@
 # Metadata storage
 
-Metadata can be stored in different ways. We've currently decided to store them on IPFS, but it has certain limitations. Let's explore the alternatives.
+Metadata can be stored in different ways. For now, we've decided to store them on IPFS, but it has certain limitations. Let's explore the alternatives.
 
 ## Options
 
@@ -17,7 +17,7 @@ Metadata can be stored in different ways. We've currently decided to store them 
   - LOOT: see on [Etherscan](https://etherscan.io/address/0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7#code)
   - tutorial on [thirdweb](https://blog.thirdweb.com/guides/how-to-create-on-chain-nfts-with-thirdweb)
   - Uniswap Positions: [NonfungibleTokenPositionDescriptor](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungibleTokenPositionDescriptor.sol) and it's imports, most notably the [NFTDescriptor](https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTDescriptor.sol) and the [NFTSVG](https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol) library
-- worrying: deployment cost of the Uniswap Positions NFT: 1.1 ETH, Loot NFT: 1.2 ETH (compared to cca 0.15 ETH for our current implementation, at comparable gas prices)
+- concerning: deployment cost of the Uniswap Positions NFT: 1.1 ETH, Loot NFT: 1.2 ETH (compared to cca 0.15 ETH for our current implementation, at comparable gas prices)
 
 ### Hybrid (metadata in the contract, image on IPFS)
 
