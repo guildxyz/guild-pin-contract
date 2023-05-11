@@ -535,15 +535,16 @@ describe("GuildCredential", () => {
       });
 
       it("should return the correct tokenURI", async () => {
+        const claimees = await ethers.getSigners();
         /* eslint-disable no-await-in-loop */
         for (let i = 0; i < cids.length; i += 1) {
-          const guildId = sampleGuildId + i;
+          const userId = sampleUserId + i;
           const signaturei = await createSignature(
             signer,
-            wallet0.address,
+            claimees[i].address,
             GuildAction.JOINED_GUILD,
-            sampleUserId,
-            guildId,
+            userId,
+            sampleGuildId,
             sampleGuildName,
             sampleJoinDate,
             timestamp,
@@ -552,10 +553,10 @@ describe("GuildCredential", () => {
           await credential.claim(
             constants.AddressZero,
             {
-              receiver: wallet0.address,
+              receiver: claimees[i].address,
               guildAction: GuildAction.JOINED_GUILD,
-              userId: sampleUserId,
-              guildId,
+              userId,
+              guildId: sampleGuildId,
               guildName: sampleGuildName,
               createdAt: sampleJoinDate
             },
@@ -567,7 +568,10 @@ describe("GuildCredential", () => {
             }
           );
           const tokenURI = await credential.tokenURI(i + 1);
-          expect(decodeTokenURI(tokenURI)).to.contain(guildId);
+          const decodedTokenURI = decodeTokenURI(tokenURI);
+          expect(decodedTokenURI).to.contain(userId);
+          expect(decodedTokenURI).to.contain(cids[i]);
+          expect(decodedTokenURI).to.contain(`"rank", "value": ${i + 1}`);
         }
         /* eslint-enable no-await-in-loop */
       });

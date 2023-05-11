@@ -15,8 +15,9 @@ interface IGuildCredential {
         address holder;
         GuildAction action;
         uint88 userId;
-        uint256 id; // guildId/roleId
         string guildName;
+        uint128 id; // guildId/roleId
+        uint128 credentialNumber;
         uint128 mintDate;
         uint128 createdAt;
     }

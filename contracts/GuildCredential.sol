@@ -40,11 +40,14 @@ contract GuildCredential is
     /// @notice Maps the tokenIds to Guild-related parameters.
     mapping(uint256 tokenId => CredentialData credential) internal claimedTokensDetails;
 
+    /// @notice Maps the guildIds to the amount of tokens minted in that guild.
+    mapping(uint256 guildId => uint256 amountMinted) internal totalMintedPerGuild;
+
     /// @notice Maps the GuildAction enum to pretty strings for metadata.
     mapping(GuildAction action => CredentialStrings prettyStrings) internal guildActionPrettyNames;
 
     /// @notice Empty space reserved for future updates.
-    uint256[45] private __gap;
+    uint256[44] private __gap;
 
     /// @notice Sets metadata and the associated addresses.
     /// @param name The name of the token.
@@ -80,13 +83,18 @@ contract GuildCredential is
 
         uint256 tokenId = totalSupply() + 1;
 
+        unchecked {
+            ++totalMintedPerGuild[credData.guildId];
+        }
+
         claimedTokens[credData.receiver][credData.guildAction][credData.guildId] = tokenId;
         claimedTokensDetails[tokenId] = CredentialData(
             credData.receiver,
             credData.guildAction,
             uint88(credData.userId),
-            credData.guildId,
             credData.guildName,
+            uint128(credData.guildId),
+            uint128(totalMintedPerGuild[credData.guildId]),
             uint128(block.timestamp),
             uint128(credData.createdAt)
         );
@@ -167,21 +175,23 @@ contract GuildCredential is
                     credential.guildName,
                     ' on Guild.xyz.", "image": "ipfs://',
                     cids[tokenId],
-                    '", "attributes": [ { "trait_type": "type", "value": "',
+                    '", "attributes": [',
+                    ' { "trait_type": "type",',
+                    ' "value": "',
                     guildActionPrettyNames[credential.action].actionName,
                     '"}, { "trait_type": "guildId",',
                     ' "value": "',
-                    credential.id.toString(),
+                    uint256(credential.id).toString(),
                     '" }, { "trait_type": "userId", "value": "',
                     uint256(credential.userId).toString(),
-                    '" }, { "trait_type": "mintDate", "display_type": "date", "value": ',
+                    '" }, { "trait_type": "mintDate",',
+                    ' "display_type": "date", "value": ',
                     uint256(credential.mintDate).toString(),
-                    ' }, { "trait_type": "actionDate",',
-                    ' "display_type": "date",',
-                    ' "value": ',
+                    ' }, { "trait_type": "actionDate", "display_type": "date", "value": ',
                     uint256(credential.createdAt).toString(),
-                    " }",
-                    " ] }"
+                    ' }, { "trait_type": "rank", "value": ',
+                    uint256(credential.credentialNumber).toString(),
+                    "} ] }"
                 )
             )
         );
