@@ -10,6 +10,37 @@ interface IGuildCredential {
         IS_ADMIN
     }
 
+    /// @notice Guild-related data assigned to every token.
+    struct CredentialData {
+        address holder;
+        GuildAction action;
+        uint88 userId;
+        uint256 id; // guildId/roleId
+        string guildName;
+        uint128 mintDate;
+        uint128 createdAt;
+    }
+
+    /// @notice The same as {CredentialData}, but without the mintDate, used as a function argument.
+    struct CredentialDataParams {
+        address receiver;
+        GuildAction guildAction;
+        uint256 userId;
+        uint256 guildId; // guildId/roleId
+        string guildName;
+        uint256 createdAt;
+    }
+
+    /// @notice Pretty strings for GuildActions. Used for metadata.
+    struct CredentialStrings {
+        // "Joined", "Created", "Admin of"
+        string actionName;
+        // "This is an on-chain proof that you joined",
+        // "This is an on-chain proof that you're the owner of",
+        // "This is an on-chain proof that you're an admin of",
+        string description;
+    }
+
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
     /// @param guildAction The action the credential was minted for.
@@ -28,17 +59,13 @@ interface IGuildCredential {
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
-    /// @param receiver The address that receives the token.
-    /// @param guildAction The action the credential is minted for.
-    /// @param guildId The id to claim the token for.
+    /// @param credData The Guild-related data, see {CredentialDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
     /// @param signature The above parameters (except the payToken) signed by validSigner.
     function claim(
         address payToken,
-        address receiver,
-        GuildAction guildAction,
-        uint256 guildId,
+        CredentialDataParams memory credData,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -51,16 +78,12 @@ interface IGuildCredential {
 
     /// @notice Updates a minted token's URI.
     /// @dev Only callable by the owner of the token.
-    /// @param tokenOwner The address that receives the token.
-    /// @param guildAction The action the credential was minted for.
-    /// @param guildId The id to claim the token for.
+    /// @param credData The Guild-related data, see {CredentialDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated metadata.
     /// @param signature The above parameters signed by validSigner.
     function updateTokenURI(
-        address tokenOwner,
-        GuildAction guildAction,
-        uint256 guildId,
+        CredentialDataParams memory credData,
         uint256 signedAt,
         string calldata newCid,
         bytes calldata signature
@@ -71,6 +94,10 @@ interface IGuildCredential {
     /// @param guildAction The action the credential was minted for.
     /// @param guildId The id the token has been claimed for.
     event Claimed(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
+
+    /// @notice Event emitted when pretty strings are set for a GuildAction.
+    /// @param guildAction The action whose strings were set.
+    event CredentialStringsSet(GuildAction guildAction);
 
     /// @notice Event emitted whenever a token's cid is updated.
     /// @param tokenId The id of the updated token.
