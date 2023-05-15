@@ -1,10 +1,10 @@
 import { ethers, upgrades } from "hardhat";
 
 // CONFIG
-const name = "Guild Credential"; // The name of the token.
-const symbol = "GUILD"; // The short, usually all caps symbol of the token.
-const treasury = "0x30B6F80A535Ecf39892ec8e7C2776910D2576cd9"; // The address where the collected fees will go.
-const validSigner = "0x989a6C5D84c932E7c9EaE8b4D2d5f378b11C21F7"; // The address that signs the parameters for claiming tokens.
+const name = ""; // The name of the token.
+const symbol = ""; // The short, usually all caps symbol of the token.
+const treasury = "0x..."; // The address where the collected fees will go.
+const validSigner = "0x..."; // The address that signs the parameters for claiming tokens.
 
 async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
