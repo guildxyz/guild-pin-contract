@@ -580,7 +580,7 @@ describe("GuildCredential", () => {
       });
     });
 
-    context("#updateTokenURI", () => {
+    context("#updateImageURI", () => {
       beforeEach("claim a token", async () => {
         await credential.claim(constants.AddressZero, sampleCredData, timestamp, cids[0], signature, { value: fee });
       });
@@ -589,21 +589,21 @@ describe("GuildCredential", () => {
         const validity = await credential.SIGNATURE_VALIDITY();
         const oldTimestamp = Math.floor(Date.now() / 1000) - validity - 10;
         await expect(
-          credential.updateTokenURI(sampleCredData, oldTimestamp, cids[0], signature)
+          credential.updateImageURI(sampleCredData, oldTimestamp, cids[0], signature)
         ).to.be.revertedWithCustomError(credential, "ExpiredSignature");
       });
 
       it("should revert if the signature is incorrect", async () => {
         await expect(
-          credential.updateTokenURI(sampleCredData, timestamp, cids[0], constants.HashZero)
+          credential.updateImageURI(sampleCredData, timestamp, cids[0], constants.HashZero)
         ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
 
         await expect(
-          credential.updateTokenURI(sampleCredData, timestamp, cids[0], signature.slice(0, -2))
+          credential.updateImageURI(sampleCredData, timestamp, cids[0], signature.slice(0, -2))
         ).to.be.revertedWithCustomError(credential, "IncorrectSignature");
 
         await expect(
-          credential.updateTokenURI(
+          credential.updateImageURI(
             sampleCredData,
             timestamp,
             cids[0],
@@ -635,7 +635,7 @@ describe("GuildCredential", () => {
           cids[0]
         );
         await expect(
-          credential.updateTokenURI(
+          credential.updateImageURI(
             {
               receiver: wallet0.address,
               guildAction: GuildAction.JOINED_GUILD,
@@ -655,7 +655,7 @@ describe("GuildCredential", () => {
 
       it("should update cid", async () => {
         const oldTokenURI = await credential.tokenURI(1);
-        await credential.updateTokenURI(
+        await credential.updateImageURI(
           sampleCredData,
           timestamp,
           cids[1],
@@ -677,7 +677,7 @@ describe("GuildCredential", () => {
       });
 
       it("should emit TokenURIUpdated event", async () => {
-        await expect(credential.updateTokenURI(sampleCredData, timestamp, cids[0], signature))
+        await expect(credential.updateImageURI(sampleCredData, timestamp, cids[0], signature))
           .to.emit(credential, "TokenURIUpdated")
           .withArgs(1);
       });
