@@ -1,11 +1,16 @@
 import { ethers, upgrades } from "hardhat";
 
+// CONFIG
+const name = ""; // The name of the token.
+const symbol = ""; // The short, usually all caps symbol of the token.
+
 const credentialAddress = "0x..."; // The address where the contract was deployed (proxy).
 
 async function main() {
   const GuildCredential = await ethers.getContractFactory("GuildCredential");
   const guildCredential = await upgrades.upgradeProxy(credentialAddress, GuildCredential, {
-    kind: "uups"
+    kind: "uups",
+    call: { fn: "reInitialize", args: [name, symbol] }
   });
 
   console.log(

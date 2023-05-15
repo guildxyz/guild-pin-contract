@@ -67,6 +67,13 @@ contract GuildCredential is
         __TreasuryManager_init(treasury);
     }
 
+    /// Sets new metadata.
+    /// @param name The name of the token.
+    /// @param symbol The symbol of the token.
+    function reInitialize(string memory name, string memory symbol) public reinitializer(2) {
+        __ERC721_init(name, symbol);
+    }
+
     function claim(
         address payToken,
         CredentialDataParams memory credData,

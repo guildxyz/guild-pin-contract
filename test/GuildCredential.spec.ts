@@ -117,12 +117,15 @@ describe("GuildCredential", () => {
   });
 
   it("should be upgradeable", async () => {
+    const newName = "Guild Pin";
+    const newSymbol = "GUILDPIN";
     const upgraded = await upgrades.upgradeProxy(credential.address, GuildCredential, {
-      kind: "uups"
+      kind: "uups",
+      call: { fn: "reInitialize", args: [newName, newSymbol] }
     });
 
-    expect(await upgraded.name()).to.eq(name);
-    expect(await upgraded.symbol()).to.eq(symbol);
+    expect(await upgraded.name()).to.eq(newName);
+    expect(await upgraded.symbol()).to.eq(newSymbol);
     expect(await upgraded.owner()).to.eq(wallet0.address);
     expect(await credential.treasury()).to.eq(treasury.address);
   });
