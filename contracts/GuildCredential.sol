@@ -46,8 +46,11 @@ contract GuildCredential is
     /// @notice Maps the GuildAction enum to pretty strings for metadata.
     mapping(GuildAction action => CredentialStrings prettyStrings) internal guildActionPrettyNames;
 
+    /// @notice The number of tokens minted in the first version of the contract.
+    uint256 internal initialTokensMinted;
+
     /// @notice Empty space reserved for future updates.
-    uint256[44] private __gap;
+    uint256[43] private __gap;
 
     /// @notice Sets metadata and the associated addresses.
     /// @param name The name of the token.
@@ -72,6 +75,26 @@ contract GuildCredential is
     /// @param symbol The symbol of the token.
     function reInitialize(string memory name, string memory symbol) public reinitializer(2) {
         __ERC721_init(name, symbol);
+        initialTokensMinted = totalSupply();
+    }
+
+    function backfillMetadata(BackfillMetadataParams[] memory params) public onlyOwner {
+        CredentialData storage credData;
+        BackfillMetadataParams memory item;
+        uint256 paramsLength = params.length;
+        for (uint256 i; i < paramsLength; ) {
+            item = params[i];
+            credData = claimedTokensDetails[item.tokenId];
+
+            credData.userId = uint88(item.userId);
+            credData.guildName = item.guildName;
+            credData.createdAt = uint128(item.createdAt);
+            credData.mintDate = uint128(item.mintDate);
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function claim(
@@ -197,7 +220,9 @@ contract GuildCredential is
                     ' }, { "trait_type": "actionDate", "display_type": "date", "value": ',
                     uint256(credential.createdAt).toString(),
                     ' }, { "trait_type": "rank", "value": ',
-                    uint256(credential.credentialNumber).toString(),
+                    tokenId > initialTokensMinted
+                        ? uint256(credential.credentialNumber).toString()
+                        : tokenId.toString(),
                     "} ] }"
                 )
             )

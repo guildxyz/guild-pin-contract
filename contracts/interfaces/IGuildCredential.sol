@@ -42,6 +42,14 @@ interface IGuildCredential {
         string description;
     }
 
+    struct BackfillMetadataParams {
+        uint256 tokenId;
+        uint256 userId;
+        string guildName;
+        uint256 createdAt;
+        uint256 mintDate;
+    }
+
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
     /// @param guildAction The action the credential was minted for.
