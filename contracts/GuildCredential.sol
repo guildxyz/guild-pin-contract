@@ -134,7 +134,7 @@ contract GuildCredential is
         emit ValidSignerChanged(newValidSigner);
     }
 
-    function updateTokenURI(
+    function updateImageURI(
         CredentialDataParams memory credData,
         uint256 signedAt,
         string calldata newCid,

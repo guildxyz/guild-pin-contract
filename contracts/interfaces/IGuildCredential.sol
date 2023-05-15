@@ -77,13 +77,13 @@ interface IGuildCredential {
     /// @param guildId The id of the guild where the token belongs to.
     function burn(GuildAction guildAction, uint256 guildId) external;
 
-    /// @notice Updates a minted token's URI.
+    /// @notice Updates a minted token's cid.
     /// @dev Only callable by the owner of the token.
     /// @param credData The Guild-related data, see {CredentialDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated metadata.
     /// @param signature The above parameters signed by validSigner.
-    function updateTokenURI(
+    function updateImageURI(
         CredentialDataParams memory credData,
         uint256 signedAt,
         string calldata newCid,
