@@ -42,12 +42,18 @@ interface IGuildPin {
         string description;
     }
 
+    /// @notice The same as {PinData}, but includes the cid and the tokenId. Omits the pinNumber.
+    /// @dev Used only while upgrading to version 2.
     struct BackfillMetadataParams {
         uint256 tokenId;
+        address holder;
+        GuildAction action;
         uint256 userId;
         string guildName;
-        uint256 createdAt;
+        uint256 id; // guildId/roleId
         uint256 mintDate;
+        uint256 createdAt;
+        string imageCid;
     }
 
     /// @notice Returns true if the address has already claimed their token.

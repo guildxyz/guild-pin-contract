@@ -79,10 +79,15 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
             item = params[i];
             pinData = claimedTokensDetails[item.tokenId];
 
+            pinData.holder = item.holder;
+            pinData.action = item.action;
             pinData.userId = uint88(item.userId);
             pinData.guildName = item.guildName;
-            pinData.createdAt = uint128(item.createdAt);
+            pinData.id = uint128(item.id);
             pinData.mintDate = uint128(item.mintDate);
+            pinData.createdAt = uint128(item.createdAt);
+
+            cids[item.tokenId] = item.imageCid;
 
             unchecked {
                 ++i;
