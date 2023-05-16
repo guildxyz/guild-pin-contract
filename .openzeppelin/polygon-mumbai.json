@@ -341,9 +341,9 @@
         }
       }
     },
-    "537b60553392deef12eaa260a158da2779bee00c814652ca0d41420455605526": {
-      "address": "0xA8E565b37ee85e12D10476a570ecA314E5A90670",
-      "txHash": "0x8f448d3842a176e7f5f8f8d151172ff3c24ef6f1311f81e6e5d6ac7497ffc214",
+    "23e2cab7ee3019c68b51a8306b48836348ebc5f63baa10c99d608dbb0050b777": {
+      "address": "0xc3563655d35397b77228c07a7F5301b0e0Fa417D",
+      "txHash": "0x3a2d6ea8c2ba47c7a157390236b7ec2338db3818b470b8f555b9b9a230b7fdba",
       "layout": {
         "solcVersion": "0.8.19",
         "storage": [
@@ -545,64 +545,64 @@
             "offset": 0,
             "slot": "451",
             "type": "t_address",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:31"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:24"
           },
           {
             "label": "cids",
             "offset": 0,
             "slot": "452",
             "type": "t_mapping(t_uint256,t_string_storage)",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:34"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:27"
           },
           {
             "label": "claimedTokens",
             "offset": 0,
             "slot": "453",
             "type": "t_mapping(t_address,t_mapping(t_enum(GuildAction)5101,t_mapping(t_uint256,t_uint256)))",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:37"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:30"
           },
           {
             "label": "claimedTokensDetails",
             "offset": 0,
             "slot": "454",
-            "type": "t_mapping(t_uint256,t_struct(CredentialData)5119_storage)",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:41"
+            "type": "t_mapping(t_uint256,t_struct(PinData)5119_storage)",
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:34"
           },
           {
             "label": "totalMintedPerGuild",
             "offset": 0,
             "slot": "455",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:44"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:37"
           },
           {
             "label": "guildActionPrettyNames",
             "offset": 0,
             "slot": "456",
-            "type": "t_mapping(t_enum(GuildAction)5101,t_struct(CredentialStrings)5138_storage)",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:47"
+            "type": "t_mapping(t_enum(GuildAction)5101,t_struct(PinStrings)5138_storage)",
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:40"
           },
           {
             "label": "initialTokensMinted",
             "offset": 0,
             "slot": "457",
             "type": "t_uint256",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:50"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:43"
           },
           {
             "label": "__gap",
             "offset": 0,
             "slot": "458",
             "type": "t_array(t_uint256)43_storage",
-            "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:53"
+            "contract": "GuildPin",
+            "src": "contracts/GuildPin.sol:46"
           }
         ],
         "types": {
@@ -647,7 +647,7 @@
             "numberOfBytes": "1"
           },
           "t_enum(GuildAction)5101": {
-            "label": "enum IGuildCredential.GuildAction",
+            "label": "enum IGuildPin.GuildAction",
             "members": [
               "JOINED_GUILD",
               "IS_OWNER",
@@ -664,7 +664,7 @@
             "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_mapping(t_enum(GuildAction)5101,t_mapping(t_uint256,t_uint256)))": {
-            "label": "mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256)))",
+            "label": "mapping(address => mapping(enum IGuildPin.GuildAction => mapping(uint256 => uint256)))",
             "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
@@ -676,11 +676,11 @@
             "numberOfBytes": "32"
           },
           "t_mapping(t_enum(GuildAction)5101,t_mapping(t_uint256,t_uint256))": {
-            "label": "mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))",
+            "label": "mapping(enum IGuildPin.GuildAction => mapping(uint256 => uint256))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_enum(GuildAction)5101,t_struct(CredentialStrings)5138_storage)": {
-            "label": "mapping(enum IGuildCredential.GuildAction => struct IGuildCredential.CredentialStrings)",
+          "t_mapping(t_enum(GuildAction)5101,t_struct(PinStrings)5138_storage)": {
+            "label": "mapping(enum IGuildPin.GuildAction => struct IGuildPin.PinStrings)",
             "numberOfBytes": "32"
           },
           "t_mapping(t_uint256,t_address)": {
@@ -691,8 +691,8 @@
             "label": "mapping(uint256 => string)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(CredentialData)5119_storage)": {
-            "label": "mapping(uint256 => struct IGuildCredential.CredentialData)",
+          "t_mapping(t_uint256,t_struct(PinData)5119_storage)": {
+            "label": "mapping(uint256 => struct IGuildPin.PinData)",
             "numberOfBytes": "32"
           },
           "t_mapping(t_uint256,t_uint256)": {
@@ -703,8 +703,8 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(CredentialData)5119_storage": {
-            "label": "struct IGuildCredential.CredentialData",
+          "t_struct(PinData)5119_storage": {
+            "label": "struct IGuildPin.PinData",
             "members": [
               {
                 "label": "holder",
@@ -737,7 +737,7 @@
                 "slot": "2"
               },
               {
-                "label": "credentialNumber",
+                "label": "pinNumber",
                 "type": "t_uint128",
                 "offset": 16,
                 "slot": "2"
@@ -757,8 +757,8 @@
             ],
             "numberOfBytes": "128"
           },
-          "t_struct(CredentialStrings)5138_storage": {
-            "label": "struct IGuildCredential.CredentialStrings",
+          "t_struct(PinStrings)5138_storage": {
+            "label": "struct IGuildPin.PinStrings",
             "members": [
               {
                 "label": "actionName",
