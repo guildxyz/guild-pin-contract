@@ -574,7 +574,7 @@ describe("GuildCredential", () => {
           const decodedTokenURI = decodeTokenURI(tokenURI);
           expect(decodedTokenURI).to.contain(userId);
           expect(decodedTokenURI).to.contain(cids[i]);
-          expect(decodedTokenURI).to.contain(`"rank", "value": ${i + 1}`);
+          expect(decodedTokenURI).to.contain(`"rank", "value": "${i + 1}"`);
         }
         /* eslint-enable no-await-in-loop */
       });
