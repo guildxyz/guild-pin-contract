@@ -219,11 +219,11 @@ contract GuildCredential is
                     uint256(credential.mintDate).toString(),
                     ' }, { "trait_type": "actionDate", "display_type": "date", "value": ',
                     uint256(credential.createdAt).toString(),
-                    ' }, { "trait_type": "rank", "value": ',
+                    ' }, { "trait_type": "rank", "value": "',
                     tokenId > initialTokensMinted
                         ? uint256(credential.credentialNumber).toString()
                         : tokenId.toString(),
-                    "} ] }"
+                    '"} ] }'
                 )
             )
         );
