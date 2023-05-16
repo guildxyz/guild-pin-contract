@@ -46,9 +46,9 @@ For tokens minted before the upgrade, the rank should equal the tokenId. We guar
 2. Make sure there are no pending transactions and upgrade the contract on Polygon.
 3. Update the metadata for all existing tokens using [backfillMetadata](contracts/interfaces/IGuildPin.md#backfillmetadata). According to previous tests, about 500 tokens can be updated in one call. The data for this should be obtained from multiple sources:
 
-- event log of the contract: filter it for the `Claimed` event.
-- the metadata previously uploaded to ipfs: note that the cids can only be obtained before the contract is upgraded.
-- Guild's API - the `createdAt` property should be queried from the Guild API directly because of a bug we discovered during development ([related PR comment](https://github.com/agoraxyz/guild-backend/pull/854#discussion_r1195202759)).
+   - event log of the contract: filter it for the `Claimed` event.
+   - the metadata previously uploaded to ipfs: note that the cids can only be obtained before the contract is upgraded.
+   - Guild's API - the `createdAt` property should be queried from the Guild API directly because of a bug we discovered during development ([related PR comment](https://github.com/agoraxyz/guild-backend/pull/854#discussion_r1195202759)).
 
 4. Call the [setPinStrings](contracts/interfaces/IGuildPin.md#setpinstrings) function for every GuildAction. This is the same logic as the one used in [tests](../test/GuildPin.spec.ts).
 5. Merge the [changes](https://github.com/agoraxyz/guild-backend/pull/854) to the core.
