@@ -53,6 +53,42 @@ function validSigner() external returns (address signer)
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `signer` | address | The address that signs the metadata. |
+### reInitialize
+
+```solidity
+function reInitialize(
+    string name,
+    string symbol
+) external
+```
+
+Sets new metadata.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `name` | string | The name of the token. |
+| `symbol` | string | The symbol of the token. |
+
+### backfillMetadata
+
+```solidity
+function backfillMetadata(
+    struct IGuildPin.BackfillMetadataParams[] params
+) external
+```
+
+Sets the metadata for already minted tokens in batches.
+
+Callable only by the owner.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `params` | struct IGuildPin.BackfillMetadataParams[] | An array of {BackfillMetadataParams}. |
+
 ### claim
 
 ```solidity
@@ -118,8 +154,28 @@ Only callable by the owner of the token.
 | :--- | :--- | :---------- |
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
-| `newCid` | string | The new cid that points to the updated metadata. |
+| `newCid` | string | The new cid that points to the updated image. |
 | `signature` | bytes | The above parameters signed by validSigner. |
+
+### setPinStrings
+
+```solidity
+function setPinStrings(
+    enum IGuildPin.GuildAction guildAction,
+    struct IGuildPin.PinStrings pinStrings
+) external
+```
+
+Set the pretty strings displayed in metadata for name and description.
+
+Only callable by the owner.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `guildAction` | enum IGuildPin.GuildAction | The action the strings are set for. |
+| `pinStrings` | struct IGuildPin.PinStrings | The strings to set. See {PinStrings}. |
 
 ## Events
 
@@ -317,10 +373,14 @@ struct PinStrings {
 ```solidity
 struct BackfillMetadataParams {
   uint256 tokenId;
+  address holder;
+  enum IGuildPin.GuildAction action;
   uint256 userId;
   string guildName;
-  uint256 createdAt;
+  uint256 id;
   uint256 mintDate;
+  uint256 createdAt;
+  string imageCid;
 }
 ```
 

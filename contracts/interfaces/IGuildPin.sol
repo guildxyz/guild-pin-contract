@@ -22,7 +22,7 @@ interface IGuildPin {
         uint128 createdAt;
     }
 
-    /// @notice The same as {PinData}, but without the mintDate, used as a function argument.
+    /// @notice The same as {PinData}, but without the mintDate and the pinNumber, used as a function argument.
     struct PinDataParams {
         address receiver;
         GuildAction guildAction;
@@ -71,6 +71,16 @@ interface IGuildPin {
     /// @return signer The address that signs the metadata.
     function validSigner() external view returns (address signer);
 
+    /// @notice Sets new metadata.
+    /// @param name The name of the token.
+    /// @param symbol The symbol of the token.
+    function reInitialize(string memory name, string memory symbol) external;
+
+    /// @notice Sets the metadata for already minted tokens in batches.
+    /// @dev Callable only by the owner.
+    /// @param params An array of {BackfillMetadataParams}.
+    function backfillMetadata(BackfillMetadataParams[] memory params) external;
+
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
@@ -95,7 +105,7 @@ interface IGuildPin {
     /// @dev Only callable by the owner of the token.
     /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
-    /// @param newCid The new cid that points to the updated metadata.
+    /// @param newCid The new cid that points to the updated image.
     /// @param signature The above parameters signed by validSigner.
     function updateImageURI(
         PinDataParams memory pinData,
@@ -103,6 +113,12 @@ interface IGuildPin {
         string calldata newCid,
         bytes calldata signature
     ) external;
+
+    /// @notice Set the pretty strings displayed in metadata for name and description.
+    /// @dev Only callable by the owner.
+    /// @param guildAction The action the strings are set for.
+    /// @param pinStrings The strings to set. See {PinStrings}.
+    function setPinStrings(GuildAction guildAction, PinStrings memory pinStrings) external;
 
     /// @notice Event emitted whenever a claim succeeds.
     /// @param receiver The address that received the tokens.

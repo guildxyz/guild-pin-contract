@@ -126,11 +126,15 @@ function backfillMetadata(
 ) public
 ```
 
+Sets the metadata for already minted tokens in batches.
+
+Callable only by the owner.
+
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `params` | struct IGuildPin.BackfillMetadataParams[] |  |
+| `params` | struct IGuildPin.BackfillMetadataParams[] | An array of {BackfillMetadataParams}. |
 
 ### claim
 
@@ -211,7 +215,7 @@ Only callable by the owner of the token.
 | :--- | :--- | :---------- |
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
-| `newCid` | string | The new cid that points to the updated metadata. |
+| `newCid` | string | The new cid that points to the updated image. |
 | `signature` | bytes | The above parameters signed by validSigner. |
 
 ### setPinStrings
@@ -223,12 +227,16 @@ function setPinStrings(
 ) public
 ```
 
+Set the pretty strings displayed in metadata for name and description.
+
+Only callable by the owner.
+
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `guildAction` | enum IGuildPin.GuildAction |  |
-| `pinStrings` | struct IGuildPin.PinStrings |  |
+| `guildAction` | enum IGuildPin.GuildAction | The action the strings are set for. |
+| `pinStrings` | struct IGuildPin.PinStrings | The strings to set. See {PinStrings}. |
 
 ### hasClaimed
 
