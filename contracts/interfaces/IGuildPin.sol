@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 /// @title An NFT representing actions taken by Guild.xyz users.
-interface IGuildCredential {
-    /// @notice Actions taken on Guild that can be rewarded with a credential.
+interface IGuildPin {
+    /// @notice Actions taken on Guild that can be rewarded with a pin.
     enum GuildAction {
         JOINED_GUILD,
         IS_OWNER,
@@ -11,19 +11,19 @@ interface IGuildCredential {
     }
 
     /// @notice Guild-related data assigned to every token.
-    struct CredentialData {
+    struct PinData {
         address holder;
         GuildAction action;
         uint88 userId;
         string guildName;
         uint128 id; // guildId/roleId
-        uint128 credentialNumber;
+        uint128 pinNumber;
         uint128 mintDate;
         uint128 createdAt;
     }
 
-    /// @notice The same as {CredentialData}, but without the mintDate, used as a function argument.
-    struct CredentialDataParams {
+    /// @notice The same as {PinData}, but without the mintDate, used as a function argument.
+    struct PinDataParams {
         address receiver;
         GuildAction guildAction;
         uint256 userId;
@@ -33,7 +33,7 @@ interface IGuildCredential {
     }
 
     /// @notice Pretty strings for GuildActions. Used for metadata.
-    struct CredentialStrings {
+    struct PinStrings {
         // "Joined", "Created", "Admin of"
         string actionName;
         // "This is an on-chain proof that you joined",
@@ -52,7 +52,7 @@ interface IGuildCredential {
 
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
-    /// @param guildAction The action the credential was minted for.
+    /// @param guildAction The action the pin was minted for.
     /// @param id The id of the guild or role the token was minted for.
     /// @return claimed Whether the address has claimed their token.
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed);
@@ -68,13 +68,13 @@ interface IGuildCredential {
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.
     /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
-    /// @param credData The Guild-related data, see {CredentialDataParams}.
+    /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
     /// @param signature The above parameters (except the payToken) signed by validSigner.
     function claim(
         address payToken,
-        CredentialDataParams memory credData,
+        PinDataParams memory pinData,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -87,12 +87,12 @@ interface IGuildCredential {
 
     /// @notice Updates a minted token's cid.
     /// @dev Only callable by the owner of the token.
-    /// @param credData The Guild-related data, see {CredentialDataParams}.
+    /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated metadata.
     /// @param signature The above parameters signed by validSigner.
     function updateImageURI(
-        CredentialDataParams memory credData,
+        PinDataParams memory pinData,
         uint256 signedAt,
         string calldata newCid,
         bytes calldata signature
@@ -100,13 +100,13 @@ interface IGuildCredential {
 
     /// @notice Event emitted whenever a claim succeeds.
     /// @param receiver The address that received the tokens.
-    /// @param guildAction The action the credential was minted for.
+    /// @param guildAction The action the pin was minted for.
     /// @param guildId The id the token has been claimed for.
     event Claimed(address indexed receiver, GuildAction indexed guildAction, uint256 indexed guildId);
 
     /// @notice Event emitted when pretty strings are set for a GuildAction.
     /// @param guildAction The action whose strings were set.
-    event CredentialStringsSet(GuildAction guildAction);
+    event PinStringsSet(GuildAction guildAction);
 
     /// @notice Event emitted whenever a token's cid is updated.
     /// @param tokenId The id of the updated token.

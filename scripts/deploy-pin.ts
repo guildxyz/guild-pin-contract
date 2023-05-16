@@ -7,8 +7,8 @@ const treasury = "0x..."; // The address where the collected fees will go.
 const validSigner = "0x..."; // The address that signs the parameters for claiming tokens.
 
 async function main() {
-  const GuildCredential = await ethers.getContractFactory("GuildCredential");
-  const guildCredential = await upgrades.deployProxy(GuildCredential, [name, symbol, treasury, validSigner], {
+  const GuildPin = await ethers.getContractFactory("GuildPin");
+  const guildPin = await upgrades.deployProxy(GuildPin, [name, symbol, treasury, validSigner], {
     kind: "uups"
   });
 
@@ -17,11 +17,11 @@ async function main() {
       ethers.provider.network.name !== "unknown" ? ethers.provider.network.name : ethers.provider.network.chainId
     }...`
   );
-  console.log(`Tx hash: ${guildCredential.deployTransaction.hash}`);
+  console.log(`Tx hash: ${guildPin.deployTransaction.hash}`);
 
-  await guildCredential.deployed();
+  await guildPin.deployed();
 
-  console.log("GuildCredential deployed to:", guildCredential.address);
+  console.log("GuildPin deployed to:", guildPin.address);
 }
 
 main().catch((error) => {

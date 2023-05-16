@@ -1,4 +1,4 @@
-# IGuildCredential
+# IGuildPin
 
 An NFT representing actions taken by Guild.xyz users.
 
@@ -9,7 +9,7 @@ An NFT representing actions taken by Guild.xyz users.
 ```solidity
 function hasClaimed(
     address account,
-    enum IGuildCredential.GuildAction guildAction,
+    enum IGuildPin.GuildAction guildAction,
     uint256 id
 ) external returns (bool claimed)
 ```
@@ -21,7 +21,7 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `account` | address | The user's address. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
+| `guildAction` | enum IGuildPin.GuildAction | The action the pin was minted for. |
 | `id` | uint256 | The id of the guild or role the token was minted for. |
 
 #### Return Values
@@ -58,9 +58,7 @@ function validSigner() external returns (address signer)
 ```solidity
 function claim(
     address payToken,
-    address receiver,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
+    struct IGuildPin.PinDataParams pinData,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -76,9 +74,7 @@ The contract needs to be approved if ERC20 tokens are used.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
-| `receiver` | address | The address that receives the token. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential is minted for. |
-| `guildId` | uint256 | The id to claim the token for. |
+| `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 | `signature` | bytes | The above parameters (except the payToken) signed by validSigner. |
@@ -87,7 +83,7 @@ The contract needs to be approved if ERC20 tokens are used.
 
 ```solidity
 function burn(
-    enum IGuildCredential.GuildAction guildAction,
+    enum IGuildPin.GuildAction guildAction,
     uint256 guildId
 ) external
 ```
@@ -98,23 +94,21 @@ Burns a token from the sender.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
+| `guildAction` | enum IGuildPin.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
 
-### updateTokenURI
+### updateImageURI
 
 ```solidity
-function updateTokenURI(
-    address tokenOwner,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
+function updateImageURI(
+    struct IGuildPin.PinDataParams pinData,
     uint256 signedAt,
     string newCid,
     bytes signature
 ) external
 ```
 
-Updates a minted token's URI.
+Updates a minted token's cid.
 
 Only callable by the owner of the token.
 
@@ -122,9 +116,7 @@ Only callable by the owner of the token.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `tokenOwner` | address | The address that receives the token. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
-| `guildId` | uint256 | The id to claim the token for. |
+| `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `newCid` | string | The new cid that points to the updated metadata. |
 | `signature` | bytes | The above parameters signed by validSigner. |
@@ -136,7 +128,7 @@ Only callable by the owner of the token.
 ```solidity
 event Claimed(
     address receiver,
-    enum IGuildCredential.GuildAction guildAction,
+    enum IGuildPin.GuildAction guildAction,
     uint256 guildId
 )
 ```
@@ -148,8 +140,23 @@ Event emitted whenever a claim succeeds.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `receiver` | address | The address that received the tokens. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
+| `guildAction` | enum IGuildPin.GuildAction | The action the pin was minted for. |
 | `guildId` | uint256 | The id the token has been claimed for. |
+### PinStringsSet
+
+```solidity
+event PinStringsSet(
+    enum IGuildPin.GuildAction guildAction
+)
+```
+
+Event emitted when pretty strings are set for a GuildAction.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `guildAction` | enum IGuildPin.GuildAction | The action whose strings were set. |
 ### TokenURIUpdated
 
 ```solidity
@@ -269,6 +276,51 @@ enum GuildAction {
   JOINED_GUILD,
   IS_OWNER,
   IS_ADMIN
+}
+```
+### PinData
+
+```solidity
+struct PinData {
+  address holder;
+  enum IGuildPin.GuildAction action;
+  uint88 userId;
+  string guildName;
+  uint128 id;
+  uint128 pinNumber;
+  uint128 mintDate;
+  uint128 createdAt;
+}
+```
+### PinDataParams
+
+```solidity
+struct PinDataParams {
+  address receiver;
+  enum IGuildPin.GuildAction guildAction;
+  uint256 userId;
+  uint256 guildId;
+  string guildName;
+  uint256 createdAt;
+}
+```
+### PinStrings
+
+```solidity
+struct PinStrings {
+  string actionName;
+  string description;
+}
+```
+### BackfillMetadataParams
+
+```solidity
+struct BackfillMetadataParams {
+  uint256 tokenId;
+  uint256 userId;
+  string guildName;
+  uint256 createdAt;
+  uint256 mintDate;
 }
 ```
 

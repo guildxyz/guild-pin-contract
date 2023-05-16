@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { IGuildCredential } from "./interfaces/IGuildCredential.sol";
+import { IGuildPin } from "./interfaces/IGuildPin.sol";
 import { LibTransfer } from "./lib/LibTransfer.sol";
 import { SoulboundERC721 } from "./token/SoulboundERC721.sol";
 import { TreasuryManager } from "./utils/TreasuryManager.sol";
@@ -13,14 +13,7 @@ import { ECDSAUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/cryp
 import { StringsUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 /// @title An NFT representing actions taken by Guild.xyz users.
-contract GuildCredential is
-    IGuildCredential,
-    Initializable,
-    OwnableUpgradeable,
-    UUPSUpgradeable,
-    SoulboundERC721,
-    TreasuryManager
-{
+contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeable, SoulboundERC721, TreasuryManager {
     using ECDSAUpgradeable for bytes32;
     using StringsUpgradeable for address;
     using StringsUpgradeable for uint256;
@@ -38,13 +31,13 @@ contract GuildCredential is
         internal claimedTokens;
 
     /// @notice Maps the tokenIds to Guild-related parameters.
-    mapping(uint256 tokenId => CredentialData credential) internal claimedTokensDetails;
+    mapping(uint256 tokenId => PinData pin) internal claimedTokensDetails;
 
     /// @notice Maps the guildIds to the amount of tokens minted in that guild.
     mapping(uint256 guildId => uint256 amountMinted) internal totalMintedPerGuild;
 
     /// @notice Maps the GuildAction enum to pretty strings for metadata.
-    mapping(GuildAction action => CredentialStrings prettyStrings) internal guildActionPrettyNames;
+    mapping(GuildAction action => PinStrings prettyStrings) internal guildActionPrettyNames;
 
     /// @notice The number of tokens minted in the first version of the contract.
     uint256 internal initialTokensMinted;
@@ -79,17 +72,17 @@ contract GuildCredential is
     }
 
     function backfillMetadata(BackfillMetadataParams[] memory params) public onlyOwner {
-        CredentialData storage credData;
+        PinData storage pinData;
         BackfillMetadataParams memory item;
         uint256 paramsLength = params.length;
         for (uint256 i; i < paramsLength; ) {
             item = params[i];
-            credData = claimedTokensDetails[item.tokenId];
+            pinData = claimedTokensDetails[item.tokenId];
 
-            credData.userId = uint88(item.userId);
-            credData.guildName = item.guildName;
-            credData.createdAt = uint128(item.createdAt);
-            credData.mintDate = uint128(item.mintDate);
+            pinData.userId = uint88(item.userId);
+            pinData.guildName = item.guildName;
+            pinData.createdAt = uint128(item.createdAt);
+            pinData.mintDate = uint128(item.mintDate);
 
             unchecked {
                 ++i;
@@ -99,14 +92,14 @@ contract GuildCredential is
 
     function claim(
         address payToken,
-        CredentialDataParams memory credData,
+        PinDataParams memory pinData,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
     ) external payable {
         if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
-        if (claimedTokens[credData.receiver][credData.guildAction][credData.guildId] != 0) revert AlreadyClaimed();
-        if (!isValidSignature(credData, signedAt, cid, signature)) revert IncorrectSignature();
+        if (claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId] != 0) revert AlreadyClaimed();
+        if (!isValidSignature(pinData, signedAt, cid, signature)) revert IncorrectSignature();
 
         uint256 fee = fee[payToken];
         if (fee == 0) revert IncorrectPayToken(payToken);
@@ -114,19 +107,19 @@ contract GuildCredential is
         uint256 tokenId = totalSupply() + 1;
 
         unchecked {
-            ++totalMintedPerGuild[credData.guildId];
+            ++totalMintedPerGuild[pinData.guildId];
         }
 
-        claimedTokens[credData.receiver][credData.guildAction][credData.guildId] = tokenId;
-        claimedTokensDetails[tokenId] = CredentialData(
-            credData.receiver,
-            credData.guildAction,
-            uint88(credData.userId),
-            credData.guildName,
-            uint128(credData.guildId),
-            uint128(totalMintedPerGuild[credData.guildId]),
+        claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId] = tokenId;
+        claimedTokensDetails[tokenId] = PinData(
+            pinData.receiver,
+            pinData.guildAction,
+            uint88(pinData.userId),
+            pinData.guildName,
+            uint128(pinData.guildId),
+            uint128(totalMintedPerGuild[pinData.guildId]),
             uint128(block.timestamp),
-            uint128(credData.createdAt)
+            uint128(pinData.createdAt)
         );
         cids[tokenId] = cid;
 
@@ -137,9 +130,9 @@ contract GuildCredential is
         else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
         else treasury.sendEther(fee);
 
-        _safeMint(credData.receiver, tokenId);
+        _safeMint(pinData.receiver, tokenId);
 
-        emit Claimed(credData.receiver, credData.guildAction, credData.guildId);
+        emit Claimed(pinData.receiver, pinData.guildAction, pinData.guildId);
     }
 
     function burn(GuildAction guildAction, uint256 guildId) external {
@@ -158,15 +151,15 @@ contract GuildCredential is
     }
 
     function updateImageURI(
-        CredentialDataParams memory credData,
+        PinDataParams memory pinData,
         uint256 signedAt,
         string calldata newCid,
         bytes calldata signature
     ) external {
         if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
-        if (!isValidSignature(credData, signedAt, newCid, signature)) revert IncorrectSignature();
+        if (!isValidSignature(pinData, signedAt, newCid, signature)) revert IncorrectSignature();
 
-        uint256 tokenId = claimedTokens[credData.receiver][credData.guildAction][credData.guildId];
+        uint256 tokenId = claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId];
         if (tokenId == 0) revert NonExistentToken(tokenId);
 
         cids[tokenId] = newCid;
@@ -174,12 +167,9 @@ contract GuildCredential is
         emit TokenURIUpdated(tokenId);
     }
 
-    function setCredentialStrings(
-        GuildAction guildAction,
-        CredentialStrings memory credentialStrings
-    ) public onlyOwner {
-        guildActionPrettyNames[guildAction] = credentialStrings;
-        emit CredentialStringsSet(guildAction);
+    function setPinStrings(GuildAction guildAction, PinStrings memory pinStrings) public onlyOwner {
+        guildActionPrettyNames[guildAction] = pinStrings;
+        emit PinStringsSet(guildAction);
     }
 
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed) {
@@ -189,40 +179,38 @@ contract GuildCredential is
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) revert NonExistentToken(tokenId);
 
-        CredentialData memory credential = claimedTokensDetails[tokenId];
+        PinData memory pin = claimedTokensDetails[tokenId];
 
         // solhint-disable quotes
         string memory json = Base64Upgradeable.encode(
             bytes(
                 string.concat(
                     '{"name": "',
-                    guildActionPrettyNames[credential.action].actionName,
+                    guildActionPrettyNames[pin.action].actionName,
                     " ",
-                    credential.guildName,
+                    pin.guildName,
                     '", "description": "',
-                    guildActionPrettyNames[credential.action].description,
+                    guildActionPrettyNames[pin.action].description,
                     " ",
-                    credential.guildName,
+                    pin.guildName,
                     ' on Guild.xyz.", "image": "ipfs://',
                     cids[tokenId],
                     '", "attributes": [',
                     ' { "trait_type": "type",',
                     ' "value": "',
-                    guildActionPrettyNames[credential.action].actionName,
+                    guildActionPrettyNames[pin.action].actionName,
                     '"}, { "trait_type": "guildId",',
                     ' "value": "',
-                    uint256(credential.id).toString(),
+                    uint256(pin.id).toString(),
                     '" }, { "trait_type": "userId", "value": "',
-                    uint256(credential.userId).toString(),
+                    uint256(pin.userId).toString(),
                     '" }, { "trait_type": "mintDate",',
                     ' "display_type": "date", "value": ',
-                    uint256(credential.mintDate).toString(),
+                    uint256(pin.mintDate).toString(),
                     ' }, { "trait_type": "actionDate", "display_type": "date", "value": ',
-                    uint256(credential.createdAt).toString(),
+                    uint256(pin.createdAt).toString(),
                     ' }, { "trait_type": "rank", "value": "',
-                    tokenId > initialTokensMinted
-                        ? uint256(credential.credentialNumber).toString()
-                        : tokenId.toString(),
+                    tokenId > initialTokensMinted ? uint256(pin.pinNumber).toString() : tokenId.toString(),
                     '"} ] }'
                 )
             )
@@ -237,7 +225,7 @@ contract GuildCredential is
 
     /// @notice Checks the validity of the signature for the given params.
     function isValidSignature(
-        CredentialDataParams memory credData,
+        PinDataParams memory pinData,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -245,12 +233,12 @@ contract GuildCredential is
         if (signature.length != 65) revert IncorrectSignature();
         bytes32 message = keccak256(
             abi.encode(
-                credData.receiver,
-                credData.guildAction,
-                credData.userId,
-                credData.guildId,
-                credData.guildName,
-                credData.createdAt,
+                pinData.receiver,
+                pinData.guildAction,
+                pinData.userId,
+                pinData.guildId,
+                pinData.guildName,
+                pinData.createdAt,
                 signedAt,
                 cid
             )

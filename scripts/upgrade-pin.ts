@@ -4,11 +4,11 @@ import { ethers, upgrades } from "hardhat";
 const name = ""; // The name of the token.
 const symbol = ""; // The short, usually all caps symbol of the token.
 
-const credentialAddress = "0x..."; // The address where the contract was deployed (proxy).
+const pinAddress = "0x..."; // The address where the contract was deployed (proxy).
 
 async function main() {
-  const GuildCredential = await ethers.getContractFactory("GuildCredential");
-  const guildCredential = await upgrades.upgradeProxy(credentialAddress, GuildCredential, {
+  const GuildPin = await ethers.getContractFactory("GuildPin");
+  const guildPin = await upgrades.upgradeProxy(pinAddress, GuildPin, {
     kind: "uups",
     call: { fn: "reInitialize", args: [name, symbol] }
   });
@@ -18,11 +18,11 @@ async function main() {
       ethers.provider.network.name !== "unknown" ? ethers.provider.network.name : ethers.provider.network.chainId
     }...`
   );
-  console.log(`Tx hash: ${guildCredential.deployTransaction.hash}`);
+  console.log(`Tx hash: ${guildPin.deployTransaction.hash}`);
 
-  await guildCredential.deployed();
+  await guildPin.deployed();
 
-  console.log("GuildCredential deployed to:", guildCredential.address);
+  console.log("GuildPin deployed to:", guildPin.address);
 }
 
 main().catch((error) => {
