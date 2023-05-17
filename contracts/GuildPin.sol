@@ -66,6 +66,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
     function reInitialize(string memory name, string memory symbol) public reinitializer(2) {
         __ERC721_init(name, symbol);
         initialTokensMinted = totalSupply();
+        totalMintedPerGuild[1985] = totalSupply();
     }
 
     function backfillMetadata(BackfillMetadataParams[] memory params) public onlyOwner {
