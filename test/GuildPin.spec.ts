@@ -530,6 +530,17 @@ describe("GuildPin", () => {
         await expect(pin.tokenURI(84)).to.revertedWithCustomError(pin, "NonExistentToken").withArgs(84);
       });
 
+      it("should include the pretty strings", async () => {
+        await pin.claim(constants.AddressZero, samplePinData, timestamp, cids[0], signature, { value: fee });
+        const tokenURI = await pin.tokenURI(1);
+        const decodedTokenURI = decodeTokenURI(tokenURI);
+        console.log(decodedTokenURI);
+        expect(decodedTokenURI).to.contain(`"name": "Joined ${sampleGuildName}"`);
+        expect(decodedTokenURI).to.contain(
+          `"description": "This is an on-chain proof that you joined ${sampleGuildName} on Guild.xyz."`
+        );
+      });
+
       it("should return the correct tokenURI", async () => {
         const claimees = await ethers.getSigners();
         /* eslint-disable no-await-in-loop */
