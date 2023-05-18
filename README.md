@@ -1,4 +1,4 @@
-# Guild Credential
+# Guild Pin
 
 An NFT representing actions taken by [Guild.xyz](https://guild.xyz) users.
 
@@ -77,10 +77,10 @@ To run the unit tests written for this project, execute this command in a termin
 npm test
 ```
 
-To run the unit tests only in a specific file, just append the path to the command. For example, to run tests just for GuildCredential:
+To run the unit tests only in a specific file, just append the path to the command. For example, to run tests just for GuildPin:
 
 ```bash
-npm test test/GuildCredential.spec.ts
+npm test test/GuildPin.spec.ts
 ```
 
 ## Documentation

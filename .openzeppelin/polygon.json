@@ -237,7 +237,7 @@
             "slot": "454",
             "type": "t_array(t_uint256)47_storage",
             "contract": "GuildCredential",
-            "src": "contracts/GuildCredential.sol:37"
+            "src": "contracts/GuildCredential.sol:38"
           }
         ],
         "types": {

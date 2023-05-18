@@ -1,10 +1,10 @@
-# Guild Credential redesign
+# Guild Pin redesign
 
-We arrived to a stage where we should rethink how distributing credentials is done. This documents the already considered solutions as well as proposes a new one.
+We arrived to a stage where we should rethink how distributing pins is done. This documents the already considered solutions as well as proposes a new one.
 
 ## Requirements
 
-- users should be able to mint credentials based on activity on Guild
+- users should be able to mint pins based on activity on Guild
 - users should pay a fee
 - users should not be able to alter metadata
   - the metadata should be uploaded by us, in a controlled environment
@@ -17,9 +17,9 @@ The server-side code is a part of Guild's [core](https://github.com/agoraxyz/gui
 
 #### Flow
 
-- the user selects the credential they want to mint on the Guild UI (only the ones the user has access to are displayed)
+- the user selects the pin they want to mint on the Guild UI (only the ones the user has access to are displayed)
 - the UI makes a call to the server
-  - parameters: userAddress, [guildAction](contracts/interfaces/IGuildCredential.md#guildaction), id (guildId/roleId based on the check)
+  - parameters: userAddress, [guildAction](contracts/interfaces/IGuildPin.md#guildaction), id (guildId/roleId based on the check)
 - the server:
   - checks the access (needs direct db access or an api call to the core in case of becoming a separate service)
   - generates the metadata and uploads/pins it on IPFS
@@ -31,7 +31,7 @@ The server-side code is a part of Guild's [core](https://github.com/agoraxyz/gui
   - verifies the signature (reverts if it's invalid)
   - updates the claimedTokens mapping
   - sends the fee to the treasury
-  - mints the credential
+  - mints the pin
 
 ![flow](img/flow.png)
 
@@ -41,12 +41,12 @@ The idea was to use a [Chainlink](https://chain.link/) oracle to check access dy
 
 #### The flow without caring for metadata
 
-- the user selects the credential they want to mint on the Guild UI (only the ones the user has access to are displayed)
+- the user selects the pin they want to mint on the Guild UI (only the ones the user has access to are displayed)
 - the user initiates a transaction to the contract
 - the contract requests the oracle whether the user has access
 - the oracle calls one of our endpoints ([user/membership/{address}](https://api.guild.xyz/v1/user/membership/{address}?format=oracle) or [guild/access/{guildId}/{address}](https://api.guild.xyz/v1/guild/access/{guildId}/{address}?format=oracle))
 - the oracle sends a transaction to the contract with the result
-- the contract either mints the credential or reverts, based on the result
+- the contract either mints the pin or reverts, based on the result
 
 #### The metadata problem and it's solutions
 

@@ -1,4 +1,4 @@
-# GuildCredential
+# GuildPin
 
 An NFT representing actions taken by Guild.xyz users.
 
@@ -34,13 +34,47 @@ address validSigner
 mapping(uint256 => string) cids
 ```
 
-Mapping tokenIds to cids (for tokenURIs).
+Maps the tokenIds to cids (for tokenURIs).
 
 ### claimedTokens
 
 ```solidity
-mapping(address => mapping(enum IGuildCredential.GuildAction => mapping(uint256 => uint256))) claimedTokens
+mapping(address => mapping(enum IGuildPin.GuildAction => mapping(uint256 => uint256))) claimedTokens
 ```
+
+Maps the Guild-related parameters to a tokenId.
+
+### claimedTokensDetails
+
+```solidity
+mapping(uint256 => struct IGuildPin.PinData) claimedTokensDetails
+```
+
+Maps the tokenIds to Guild-related parameters.
+
+### totalMintedPerGuild
+
+```solidity
+mapping(uint256 => uint256) totalMintedPerGuild
+```
+
+Maps the guildIds to the amount of tokens minted in that guild.
+
+### guildActionPrettyNames
+
+```solidity
+mapping(enum IGuildPin.GuildAction => struct IGuildPin.PinStrings) guildActionPrettyNames
+```
+
+Maps the GuildAction enum to pretty strings for metadata.
+
+### initialTokensMinted
+
+```solidity
+uint256 initialTokensMinted
+```
+
+The number of tokens minted in the first version of the contract.
 
 ## Functions
 
@@ -66,14 +100,48 @@ Sets metadata and the associated addresses.
 | `treasury` | address payable | The address where the collected fees will be sent. |
 | `_validSigner` | address | The address that should sign the parameters for certain functions. |
 
+### reInitialize
+
+```solidity
+function reInitialize(
+    string name,
+    string symbol
+) public
+```
+
+Sets new metadata.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `name` | string | The name of the token. |
+| `symbol` | string | The symbol of the token. |
+
+### backfillMetadata
+
+```solidity
+function backfillMetadata(
+    struct IGuildPin.BackfillMetadataParams[] params
+) public
+```
+
+Sets the metadata for already minted tokens in batches.
+
+Callable only by the owner.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `params` | struct IGuildPin.BackfillMetadataParams[] | An array of {BackfillMetadataParams}. |
+
 ### claim
 
 ```solidity
 function claim(
     address payToken,
-    address receiver,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
+    struct IGuildPin.PinDataParams pinData,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -89,9 +157,7 @@ The contract needs to be approved if ERC20 tokens are used.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
-| `receiver` | address | The address that receives the token. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential is minted for. |
-| `guildId` | uint256 | The id to claim the token for. |
+| `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 | `signature` | bytes | The above parameters (except the payToken) signed by validSigner. |
@@ -100,7 +166,7 @@ The contract needs to be approved if ERC20 tokens are used.
 
 ```solidity
 function burn(
-    enum IGuildCredential.GuildAction guildAction,
+    enum IGuildPin.GuildAction guildAction,
     uint256 guildId
 ) external
 ```
@@ -111,7 +177,7 @@ Burns a token from the sender.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `guildAction` | enum IGuildCredential.GuildAction | The action to which the token belongs to. |
+| `guildAction` | enum IGuildPin.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
 
 ### setValidSigner
@@ -128,20 +194,18 @@ function setValidSigner(
 | :--- | :--- | :---------- |
 | `newValidSigner` | address |  |
 
-### updateTokenURI
+### updateImageURI
 
 ```solidity
-function updateTokenURI(
-    address tokenOwner,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
+function updateImageURI(
+    struct IGuildPin.PinDataParams pinData,
     uint256 signedAt,
     string newCid,
     bytes signature
 ) external
 ```
 
-Updates a minted token's URI.
+Updates a minted token's cid.
 
 Only callable by the owner of the token.
 
@@ -149,19 +213,37 @@ Only callable by the owner of the token.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `tokenOwner` | address | The address that receives the token. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
-| `guildId` | uint256 | The id to claim the token for. |
+| `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
-| `newCid` | string | The new cid that points to the updated metadata. |
+| `newCid` | string | The new cid that points to the updated image. |
 | `signature` | bytes | The above parameters signed by validSigner. |
+
+### setPinStrings
+
+```solidity
+function setPinStrings(
+    enum IGuildPin.GuildAction guildAction,
+    struct IGuildPin.PinStrings pinStrings
+) public
+```
+
+Set the pretty strings displayed in metadata for name and description.
+
+Only callable by the owner.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `guildAction` | enum IGuildPin.GuildAction | The action the strings are set for. |
+| `pinStrings` | struct IGuildPin.PinStrings | The strings to set. See {PinStrings}. |
 
 ### hasClaimed
 
 ```solidity
 function hasClaimed(
     address account,
-    enum IGuildCredential.GuildAction guildAction,
+    enum IGuildPin.GuildAction guildAction,
     uint256 id
 ) external returns (bool claimed)
 ```
@@ -173,7 +255,7 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `account` | address | The user's address. |
-| `guildAction` | enum IGuildCredential.GuildAction | The action the credential was minted for. |
+| `guildAction` | enum IGuildPin.GuildAction | The action the pin was minted for. |
 | `id` | uint256 | The id of the guild or role the token was minted for. |
 
 #### Return Values
@@ -215,9 +297,7 @@ function _authorizeUpgrade(
 
 ```solidity
 function isValidSignature(
-    address receiver,
-    enum IGuildCredential.GuildAction guildAction,
-    uint256 guildId,
+    struct IGuildPin.PinDataParams pinData,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -230,9 +310,7 @@ Checks the validity of the signature for the given params.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `receiver` | address |  |
-| `guildAction` | enum IGuildCredential.GuildAction |  |
-| `guildId` | uint256 |  |
+| `pinData` | struct IGuildPin.PinDataParams |  |
 | `signedAt` | uint256 |  |
 | `cid` | string |  |
 | `signature` | bytes |  |
