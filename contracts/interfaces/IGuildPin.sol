@@ -42,20 +42,6 @@ interface IGuildPin {
         string description;
     }
 
-    /// @notice The same as {PinData}, but includes the cid and the tokenId. Omits the pinNumber.
-    /// @dev Used only while upgrading to version 2.
-    struct BackfillMetadataParams {
-        uint256 tokenId;
-        address holder;
-        GuildAction action;
-        uint256 userId;
-        string guildName;
-        uint256 id; // guildId/roleId
-        uint256 mintDate;
-        uint256 createdAt;
-        string imageCid;
-    }
-
     /// @notice Returns true if the address has already claimed their token.
     /// @param account The user's address.
     /// @param guildAction The action the pin was minted for.
@@ -70,16 +56,6 @@ interface IGuildPin {
 
     /// @return signer The address that signs the metadata.
     function validSigner() external view returns (address signer);
-
-    /// @notice Sets new metadata.
-    /// @param name The name of the token.
-    /// @param symbol The symbol of the token.
-    function reInitialize(string memory name, string memory symbol) external;
-
-    /// @notice Sets the metadata for already minted tokens in batches.
-    /// @dev Callable only by the owner.
-    /// @param params An array of {BackfillMetadataParams}.
-    function backfillMetadata(BackfillMetadataParams[] memory params) external;
 
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.

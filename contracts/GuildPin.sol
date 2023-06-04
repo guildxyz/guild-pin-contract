@@ -63,35 +63,9 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         __TreasuryManager_init(treasury);
     }
 
-    function reInitialize(string memory name, string memory symbol) public reinitializer(2) {
-        __ERC721_init(name, symbol);
-        initialTokensMinted = totalSupply();
-        totalMintedPerGuild[1985] = totalSupply();
-    }
-
-    function backfillMetadata(BackfillMetadataParams[] memory params) public onlyOwner {
-        PinData storage pinData;
-        BackfillMetadataParams memory item;
-        uint256 paramsLength = params.length;
-        for (uint256 i; i < paramsLength; ) {
-            item = params[i];
-            pinData = claimedTokensDetails[item.tokenId];
-
-            pinData.holder = item.holder;
-            pinData.action = item.action;
-            pinData.userId = uint88(item.userId);
-            pinData.guildName = item.guildName;
-            pinData.id = uint128(item.id);
-            pinData.mintDate = uint128(item.mintDate);
-            pinData.createdAt = uint128(item.createdAt);
-
-            cids[item.tokenId] = item.imageCid;
-
-            unchecked {
-                ++i;
-            }
-        }
-    }
+    // Note: the reInitialize function was last used with version 2
+    // function reInitialize() public reinitializer(2) {
+    // }
 
     function claim(
         address payToken,

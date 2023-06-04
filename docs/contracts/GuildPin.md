@@ -100,42 +100,6 @@ Sets metadata and the associated addresses.
 | `treasury` | address payable | The address where the collected fees will be sent. |
 | `_validSigner` | address | The address that should sign the parameters for certain functions. |
 
-### reInitialize
-
-```solidity
-function reInitialize(
-    string name,
-    string symbol
-) public
-```
-
-Sets new metadata.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `name` | string | The name of the token. |
-| `symbol` | string | The symbol of the token. |
-
-### backfillMetadata
-
-```solidity
-function backfillMetadata(
-    struct IGuildPin.BackfillMetadataParams[] params
-) public
-```
-
-Sets the metadata for already minted tokens in batches.
-
-Callable only by the owner.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `params` | struct IGuildPin.BackfillMetadataParams[] | An array of {BackfillMetadataParams}. |
-
 ### claim
 
 ```solidity

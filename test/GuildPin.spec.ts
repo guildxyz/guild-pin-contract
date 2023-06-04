@@ -117,17 +117,15 @@ describe("GuildPin", () => {
   });
 
   it("should be upgradeable", async () => {
-    const newName = "Guild Super Cool Pin";
-    const newSymbol = "GUILDPIN";
     const upgraded = await upgrades.upgradeProxy(pin.address, GuildPin, {
-      kind: "uups",
-      call: { fn: "reInitialize", args: [newName, newSymbol] }
+      kind: "uups"
+      // call: { fn: "reInitialize", args: [] }
     });
 
-    expect(await upgraded.name()).to.eq(newName);
-    expect(await upgraded.symbol()).to.eq(newSymbol);
+    expect(await upgraded.name()).to.eq(name);
+    expect(await upgraded.symbol()).to.eq(symbol);
     expect(await upgraded.owner()).to.eq(wallet0.address);
-    expect(await pin.treasury()).to.eq(treasury.address);
+    expect(await upgraded.treasury()).to.eq(treasury.address);
   });
 
   it("should be soulbound", async () => {
