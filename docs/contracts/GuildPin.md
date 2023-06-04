@@ -124,7 +124,7 @@ The contract needs to be approved if ERC20 tokens are used.
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
-| `signature` | bytes | The above parameters (except the payToken) signed by validSigner. |
+| `signature` | bytes | The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address. |
 
 ### burn
 
@@ -180,7 +180,7 @@ Only callable by the owner of the token.
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `newCid` | string | The new cid that points to the updated image. |
-| `signature` | bytes | The above parameters signed by validSigner. |
+| `signature` | bytes | The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address. |
 
 ### setPinStrings
 
