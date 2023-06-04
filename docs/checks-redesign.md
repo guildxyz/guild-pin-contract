@@ -19,10 +19,10 @@ The server-side code is a part of Guild's [core](https://github.com/agoraxyz/gui
 
 - the user selects the pin they want to mint on the Guild UI (only the ones the user has access to are displayed)
 - the UI makes a call to the server
-  - parameters: userAddress, [guildAction](contracts/interfaces/IGuildPin.md#guildaction), id (guildId/roleId based on the check)
+  - parameters: userAddress, [guildAction](contracts/interfaces/IGuildPin.md#guildaction), id (guildId/roleId based on the check), chainId, contractAddress
 - the server:
   - checks the access (needs direct db access or an api call to the core in case of becoming a separate service)
-  - generates the metadata and uploads/pins it on IPFS
+  - generates the image and uploads/pins it on IPFS
   - signs the input parameters, the cid and the current timestamp (unix seconds) using a private key
   - returns the signed data alongside the signature
 - the user initiates a transaction to the contract. Supplies the data obtained from the server and the fee
