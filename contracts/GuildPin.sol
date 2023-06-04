@@ -217,7 +217,9 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
                 pinData.guildName,
                 pinData.createdAt,
                 signedAt,
-                cid
+                cid,
+                block.chainid,
+                address(this)
             )
         ).toEthSignedMessageHash();
         return message.recover(signature) == validSigner;
