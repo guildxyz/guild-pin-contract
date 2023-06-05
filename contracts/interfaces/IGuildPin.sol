@@ -63,7 +63,7 @@ interface IGuildPin {
     /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
-    /// @param signature The above parameters (except the payToken) signed by validSigner.
+    /// @param signature The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address.
     function claim(
         address payToken,
         PinDataParams memory pinData,
@@ -82,7 +82,7 @@ interface IGuildPin {
     /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated image.
-    /// @param signature The above parameters signed by validSigner.
+    /// @param signature The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address.
     function updateImageURI(
         PinDataParams memory pinData,
         uint256 signedAt,

@@ -45,6 +45,8 @@ let samplePinData: {
   createdAt: number;
 };
 
+let chainId: BigNumberish;
+
 const pinStrings = (action: GuildAction) => {
   const actionNames = ["Joined", "Created", "Admin of"];
   const descriptions = [
@@ -67,11 +69,13 @@ const createSignature = async (
   guildName: string,
   createdAt: BigNumberish,
   signedAt: BigNumberish,
-  cid: string
+  cid: string,
+  chainid: BigNumberish,
+  pinAddress: string
 ) => {
   const payload = ethers.utils.defaultAbiCoder.encode(
-    ["address", "uint8", "uint256", "uint256", "string", "uint256", "uint256", "string"],
-    [receiver, guildAction, userId, guildId, guildName, createdAt, signedAt, cid]
+    ["address", "uint8", "uint256", "uint256", "string", "uint256", "uint256", "string", "uint256", "address"],
+    [receiver, guildAction, userId, guildId, guildName, createdAt, signedAt, cid, chainid, pinAddress]
   );
   const payloadHash = ethers.utils.keccak256(payload);
   return wallet.signMessage(ethers.utils.arrayify(payloadHash));
@@ -80,7 +84,7 @@ const createSignature = async (
 const decodeTokenURI = (tokenURI: string) => Buffer.from(tokenURI.slice(29), "base64").toString("utf-8");
 
 describe("GuildPin", () => {
-  before("get accounts", async () => {
+  before("get accounts, setup variables, deploy ERC20", async () => {
     [wallet0, randomWallet, treasury, signer] = await ethers.getSigners();
 
     samplePinData = {
@@ -91,6 +95,8 @@ describe("GuildPin", () => {
       guildName: sampleGuildName,
       createdAt: sampleJoinDate
     };
+
+    chainId = (await ethers.provider.getNetwork()).chainId;
 
     const ERC20 = await ethers.getContractFactory("MockERC20");
     mockERC20 = await ERC20.deploy("Mock Token", "MCK");
@@ -202,8 +208,11 @@ describe("GuildPin", () => {
     let timestamp: number;
     let sampleSignature: string;
 
-    before("get time, create signature", async () => {
+    before("get time", () => {
       timestamp = Math.floor(Date.now() / 1000);
+    });
+
+    beforeEach("create signature", async () => {
       sampleSignature = await createSignature(
         signer,
         wallet0.address,
@@ -213,7 +222,9 @@ describe("GuildPin", () => {
         sampleGuildName,
         sampleJoinDate,
         timestamp,
-        cids[0]
+        cids[0],
+        chainId,
+        pin.address
       );
     });
 
@@ -230,7 +241,9 @@ describe("GuildPin", () => {
           sampleGuildName,
           sampleJoinDate,
           oldTimestamp,
-          cids[0]
+          cids[0],
+          chainId,
+          pin.address
         );
         await expect(
           pin.claim(constants.AddressZero, samplePinData, oldTimestamp, cids[0], signature, { value: fee })
@@ -274,7 +287,9 @@ describe("GuildPin", () => {
               sampleGuildName,
               sampleJoinDate,
               timestamp,
-              cids[0]
+              cids[0],
+              chainId,
+              pin.address
             ),
             { value: fee }
           )
@@ -319,7 +334,9 @@ describe("GuildPin", () => {
           sampleGuildName,
           sampleJoinDate,
           timestamp,
-          cids[0]
+          cids[0],
+          chainId,
+          pin.address
         );
         const tx1 = await pin.claim(
           constants.AddressZero,
@@ -356,7 +373,9 @@ describe("GuildPin", () => {
           sampleGuildName,
           sampleJoinDate,
           timestamp,
-          cids[0]
+          cids[0],
+          chainId,
+          pin.address
         );
         const tx1 = await pin.claim(
           constants.AddressZero,
@@ -385,7 +404,9 @@ describe("GuildPin", () => {
           sampleGuildName,
           sampleJoinDate,
           timestamp,
-          cids[0]
+          cids[0],
+          chainId,
+          pin.address
         );
         const tx2 = await pin.claim(
           constants.AddressZero,
@@ -502,8 +523,15 @@ describe("GuildPin", () => {
     let timestamp: number;
     let signature: string;
 
-    before("get time, create signature", async () => {
+    before("get time", () => {
       timestamp = Math.floor(Date.now() / 1000);
+    });
+
+    beforeEach("create signature, set strings", async () => {
+      await pin.setPinStrings(GuildAction.JOINED_GUILD, pinStrings(GuildAction.JOINED_GUILD));
+      await pin.setPinStrings(GuildAction.IS_OWNER, pinStrings(GuildAction.IS_OWNER));
+      await pin.setPinStrings(GuildAction.IS_ADMIN, pinStrings(GuildAction.IS_ADMIN));
+
       signature = await createSignature(
         signer,
         wallet0.address,
@@ -513,14 +541,10 @@ describe("GuildPin", () => {
         sampleGuildName,
         sampleJoinDate,
         timestamp,
-        cids[0]
+        cids[0],
+        chainId,
+        pin.address
       );
-    });
-
-    beforeEach("set strings", async () => {
-      await pin.setPinStrings(GuildAction.JOINED_GUILD, pinStrings(GuildAction.JOINED_GUILD));
-      await pin.setPinStrings(GuildAction.IS_OWNER, pinStrings(GuildAction.IS_OWNER));
-      await pin.setPinStrings(GuildAction.IS_ADMIN, pinStrings(GuildAction.IS_ADMIN));
     });
 
     context("#tokenURI", () => {
@@ -552,7 +576,9 @@ describe("GuildPin", () => {
             sampleGuildName,
             sampleJoinDate,
             timestamp,
-            cids[i]
+            cids[i],
+            chainId,
+            pin.address
           );
           await pin.claim(
             constants.AddressZero,
@@ -618,7 +644,9 @@ describe("GuildPin", () => {
               sampleGuildName,
               sampleJoinDate,
               timestamp,
-              cids[0]
+              cids[0],
+              chainId,
+              pin.address
             )
           )
         ).to.be.revertedWithCustomError(pin, "IncorrectSignature");
@@ -634,7 +662,9 @@ describe("GuildPin", () => {
           sampleGuildName,
           sampleJoinDate,
           timestamp,
-          cids[0]
+          cids[0],
+          chainId,
+          pin.address
         );
         await expect(
           pin.updateImageURI(
@@ -670,7 +700,9 @@ describe("GuildPin", () => {
             sampleGuildName,
             sampleJoinDate,
             timestamp,
-            cids[1]
+            cids[1],
+            chainId,
+            pin.address
           )
         );
         const newTokenURI = await pin.tokenURI(1);
