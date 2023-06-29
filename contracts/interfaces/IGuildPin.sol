@@ -106,10 +106,6 @@ interface IGuildPin {
     /// @param guildAction The action whose strings were set.
     event PinStringsSet(GuildAction guildAction);
 
-    /// @notice Event emitted whenever a token's cid is updated.
-    /// @param tokenId The id of the updated token.
-    event TokenURIUpdated(uint256 tokenId);
-
     /// @notice Event emitted when the validSigner is changed.
     /// @param newValidSigner The new address of validSigner.
     event ValidSignerChanged(address newValidSigner);

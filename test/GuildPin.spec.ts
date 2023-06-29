@@ -705,9 +705,9 @@ describe("GuildPin", () => {
         expect(decodeTokenURI(newTokenURI)).to.contain(cids[1]);
       });
 
-      it("should emit TokenURIUpdated event", async () => {
+      it("should emit MetadataUpdate event", async () => {
         await expect(pin.updateImageURI(samplePinData, timestamp, cids[0], signature))
-          .to.emit(pin, "TokenURIUpdated")
+          .to.emit(pin, "MetadataUpdate")
           .withArgs(1);
       });
     });

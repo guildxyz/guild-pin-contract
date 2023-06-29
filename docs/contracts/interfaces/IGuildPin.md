@@ -177,21 +177,6 @@ Event emitted when pretty strings are set for a GuildAction.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `guildAction` | enum IGuildPin.GuildAction | The action whose strings were set. |
-### TokenURIUpdated
-
-```solidity
-event TokenURIUpdated(
-    uint256 tokenId
-)
-```
-
-Event emitted whenever a token's cid is updated.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `tokenId` | uint256 | The id of the updated token. |
 ### ValidSignerChanged
 
 ```solidity

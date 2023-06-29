@@ -141,7 +141,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
 
         cids[tokenId] = newCid;
 
-        emit TokenURIUpdated(tokenId);
+        emit MetadataUpdate(tokenId);
     }
 
     function setPinStrings(GuildAction guildAction, PinStrings memory pinStrings) public onlyOwner {
