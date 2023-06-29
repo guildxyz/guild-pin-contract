@@ -12,16 +12,13 @@ async function main() {
     kind: "uups"
   });
 
-  console.log(
-    `Deploying contract to ${
-      ethers.provider.network.name !== "unknown" ? ethers.provider.network.name : ethers.provider.network.chainId
-    }...`
-  );
-  console.log(`Tx hash: ${guildPin.deployTransaction.hash}`);
+  const network = await ethers.provider.getNetwork();
+  console.log(`Deploying contract to ${network.name !== "unknown" ? network.name : network.chainId}...`);
+  console.log(`Tx hash: ${guildPin.deploymentTransaction()?.hash}`);
 
-  await guildPin.deployed();
+  await guildPin.waitForDeployment();
 
-  console.log("GuildPin deployed to:", guildPin.address);
+  console.log("GuildPin deployed to:", await guildPin.getAddress());
 }
 
 main().catch((error) => {
