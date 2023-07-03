@@ -254,6 +254,43 @@ describe("GuildPin", () => {
         ).to.be.revertedWithCustomError(pin, "AlreadyClaimed");
       });
 
+      it("should revert if the userId has already claimed", async () => {
+        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
+          value: fee
+        });
+
+        const signature = await createSignature(
+          signer,
+          randomWallet.address,
+          GuildAction.JOINED_GUILD,
+          sampleUserId,
+          sampleGuildId,
+          sampleGuildName,
+          sampleJoinDate,
+          timestamp,
+          cids[0],
+          chainId,
+          await pin.getAddress()
+        );
+        const tx = pin.claim(
+          ethers.ZeroAddress,
+          {
+            receiver: randomWallet.address,
+            guildAction: GuildAction.JOINED_GUILD,
+            userId: sampleUserId,
+            guildId: sampleGuildId,
+            guildName: sampleGuildName,
+            createdAt: sampleJoinDate
+          },
+          timestamp,
+          cids[0],
+          signature,
+          { value: fee }
+        );
+
+        await expect(tx).to.be.revertedWithCustomError(pin, "AlreadyClaimed");
+      });
+
       it("should revert if the signature is incorrect", async () => {
         await expect(
           pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], ethers.ZeroHash, {
@@ -307,10 +344,31 @@ describe("GuildPin", () => {
       });
 
       it("should set the address's claim status", async () => {
+        const hasClaimed0 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
         await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
           value: fee
         });
-        expect(await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId)).to.eq(true);
+        const hasClaimed1 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
+        expect(hasClaimed0).to.eq(false);
+        expect(hasClaimed1).to.eq(true);
+      });
+
+      it("should set the userId's claim status", async () => {
+        const hasTheUserIdClaimed0 = await pin.hasTheUserIdClaimed(
+          sampleUserId,
+          GuildAction.JOINED_GUILD,
+          sampleGuildId
+        );
+        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
+          value: fee
+        });
+        const hasTheUserIdClaimed1 = await pin.hasTheUserIdClaimed(
+          sampleUserId,
+          GuildAction.JOINED_GUILD,
+          sampleGuildId
+        );
+        expect(hasTheUserIdClaimed0).to.eq(false);
+        expect(hasTheUserIdClaimed1).to.eq(true);
       });
 
       it("should be able to mint tokens for the same reason to different addresses", async () => {
@@ -324,7 +382,7 @@ describe("GuildPin", () => {
           signer,
           randomWallet.address,
           GuildAction.JOINED_GUILD,
-          sampleUserId,
+          sampleUserId + 1,
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
@@ -338,7 +396,7 @@ describe("GuildPin", () => {
           {
             receiver: randomWallet.address,
             guildAction: GuildAction.JOINED_GUILD,
-            userId: sampleUserId,
+            userId: sampleUserId + 1,
             guildId: sampleGuildId,
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
@@ -495,21 +553,41 @@ describe("GuildPin", () => {
 
       it("should reset hasClaimed to false", async () => {
         const hasClaimed0 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
-        await pin.burn(GuildAction.JOINED_GUILD, sampleGuildId);
+        await pin.burn(sampleUserId, GuildAction.JOINED_GUILD, sampleGuildId);
         const hasClaimed1 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
         expect(hasClaimed0).to.eq(true);
         expect(hasClaimed1).to.eq(false);
       });
 
+      it("should reset hasTheUserIdClaimed to false", async () => {
+        const hasTheUserIdClaimed0 = await pin.hasTheUserIdClaimed(
+          sampleUserId,
+          GuildAction.JOINED_GUILD,
+          sampleGuildId
+        );
+        await pin.burn(sampleUserId, GuildAction.JOINED_GUILD, sampleGuildId);
+        const hasTheUserIdClaimed1 = await pin.hasTheUserIdClaimed(
+          sampleUserId,
+          GuildAction.JOINED_GUILD,
+          sampleGuildId
+        );
+        expect(hasTheUserIdClaimed0).to.eq(true);
+        expect(hasTheUserIdClaimed1).to.eq(false);
+      });
+
       it("should decrement the total supply", async () => {
         const totalSupply0 = await pin.totalSupply();
-        await pin.burn(GuildAction.JOINED_GUILD, sampleGuildId);
+        await pin.burn(sampleUserId, GuildAction.JOINED_GUILD, sampleGuildId);
         const totalSupply1 = await pin.totalSupply();
         expect(totalSupply1).to.eq(totalSupply0 - 1n);
       });
 
       it("should burn the token", async () => {
-        await expect(pin.burn(GuildAction.JOINED_GUILD, sampleGuildId)).to.changeTokenBalance(pin, wallet0, -1);
+        await expect(pin.burn(sampleUserId, GuildAction.JOINED_GUILD, sampleGuildId)).to.changeTokenBalance(
+          pin,
+          wallet0,
+          -1
+        );
       });
     });
   });

@@ -76,6 +76,12 @@ uint256 initialTokensMinted
 
 The number of tokens minted in the first version of the contract.
 
+### claimerUserIds
+
+```solidity
+mapping(uint256 => mapping(enum IGuildPin.GuildAction => mapping(uint256 => bool))) claimerUserIds
+```
+
 ## Functions
 
 ### initialize
@@ -130,6 +136,7 @@ The contract needs to be approved if ERC20 tokens are used.
 
 ```solidity
 function burn(
+    uint256 userId,
     enum IGuildPin.GuildAction guildAction,
     uint256 guildId
 ) external
@@ -141,6 +148,7 @@ Burns a token from the sender.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
+| `userId` | uint256 | The id of the user on Guild. |
 | `guildAction` | enum IGuildPin.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
 
@@ -227,6 +235,33 @@ Returns true if the address has already claimed their token.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `claimed` | bool | Whether the address has claimed their token. |
+### hasTheUserIdClaimed
+
+```solidity
+function hasTheUserIdClaimed(
+    uint256 userId,
+    enum IGuildPin.GuildAction guildAction,
+    uint256 id
+) external returns (bool claimed)
+```
+
+Whether a userId has minted a specific pin.
+
+Used to prevent double mints in the same block.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `userId` | uint256 | The id of the user on Guild. |
+| `guildAction` | enum IGuildPin.GuildAction | The action the pin was minted for. |
+| `id` | uint256 | The id of the guild or role the token was minted for. |
+
+#### Return Values
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `claimed` | bool | Whether the userId has claimed the pin for the given action/guildId combination. |
 ### tokenURI
 
 ```solidity

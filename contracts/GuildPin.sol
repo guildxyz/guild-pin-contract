@@ -42,8 +42,11 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
     /// @notice The number of tokens minted in the first version of the contract.
     uint256 internal initialTokensMinted;
 
+    mapping(uint256 userId => mapping(GuildAction action => mapping(uint256 guildId => bool claimed)))
+        internal claimerUserIds;
+
     /// @notice Empty space reserved for future updates.
-    uint256[43] private __gap;
+    uint256[42] private __gap;
 
     /// @notice Sets metadata and the associated addresses.
     /// @param name The name of the token.
@@ -75,7 +78,10 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         bytes calldata signature
     ) external payable {
         if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
-        if (claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId] != 0) revert AlreadyClaimed();
+        if (
+            claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId] != 0 ||
+            claimerUserIds[pinData.userId][pinData.guildAction][pinData.guildId]
+        ) revert AlreadyClaimed();
         if (!isValidSignature(pinData, signedAt, cid, signature)) revert IncorrectSignature();
 
         uint256 fee = fee[payToken];
@@ -99,6 +105,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
             uint128(pinData.createdAt)
         );
         cids[tokenId] = cid;
+        claimerUserIds[pinData.userId][pinData.guildAction][pinData.guildId] = true;
 
         // Fee collection
         // When there is no msg.value, try transferring ERC20
@@ -112,12 +119,13 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         emit Claimed(pinData.receiver, pinData.guildAction, pinData.guildId);
     }
 
-    function burn(GuildAction guildAction, uint256 guildId) external {
+    function burn(uint256 userId, GuildAction guildAction, uint256 guildId) external {
         uint256 tokenId = claimedTokens[msg.sender][guildAction][guildId];
 
         claimedTokens[msg.sender][guildAction][guildId] = 0;
         delete claimedTokensDetails[tokenId];
         delete cids[tokenId];
+        delete claimerUserIds[userId][guildAction][guildId];
 
         _burn(tokenId);
     }
@@ -151,6 +159,14 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
 
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed) {
         return claimedTokens[account][guildAction][id] != 0;
+    }
+
+    function hasTheUserIdClaimed(
+        uint256 userId,
+        GuildAction guildAction,
+        uint256 id
+    ) external view returns (bool claimed) {
+        return claimerUserIds[userId][guildAction][id];
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
