@@ -49,6 +49,18 @@ interface IGuildPin {
     /// @return claimed Whether the address has claimed their token.
     function hasClaimed(address account, GuildAction guildAction, uint256 id) external view returns (bool claimed);
 
+    /// @notice Whether a userId has minted a specific pin.
+    /// @dev Used to prevent double mints in the same block.
+    /// @param userId The id of the user on Guild.
+    /// @param guildAction The action the pin was minted for.
+    /// @param id The id of the guild or role the token was minted for.
+    /// @return claimed Whether the userId has claimed the pin for the given action/guildId combination.
+    function hasTheUserIdClaimed(
+        uint256 userId,
+        GuildAction guildAction,
+        uint256 id
+    ) external view returns (bool claimed);
+
     /// @notice The time interval while a signature is valid.
     /// @return validity The time interval in seconds.
     // solhint-disable func-name-mixedcase
@@ -73,9 +85,10 @@ interface IGuildPin {
     ) external payable;
 
     /// @notice Burns a token from the sender.
+    /// @param userId The id of the user on Guild.
     /// @param guildAction The action to which the token belongs to.
     /// @param guildId The id of the guild where the token belongs to.
-    function burn(GuildAction guildAction, uint256 guildId) external;
+    function burn(uint256 userId, GuildAction guildAction, uint256 guildId) external;
 
     /// @notice Updates a minted token's cid.
     /// @dev Only callable by the owner of the token.
