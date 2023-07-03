@@ -261,9 +261,9 @@ describe("GuildPin", () => {
 
         const signature = await createSignature(
           signer,
-          wallet0.address,
+          randomWallet.address,
           GuildAction.JOINED_GUILD,
-          sampleUserId + 1,
+          sampleUserId,
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
@@ -275,9 +275,9 @@ describe("GuildPin", () => {
         const tx = pin.claim(
           ethers.ZeroAddress,
           {
-            receiver: wallet0.address,
+            receiver: randomWallet.address,
             guildAction: GuildAction.JOINED_GUILD,
-            userId: sampleUserId + 1,
+            userId: sampleUserId,
             guildId: sampleGuildId,
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
