@@ -758,6 +758,10 @@ describe("GuildPin", () => {
           .withArgs(0);
       });
 
+      it("should support ERC4906", async () => {
+        expect(await pin.supportsInterface("0x49064906")).to.eq(true);
+      });
+
       it("should update cid", async () => {
         const oldTokenURI = await pin.tokenURI(1);
         await pin.updateImageURI(
