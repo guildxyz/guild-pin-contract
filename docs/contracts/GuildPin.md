@@ -82,6 +82,8 @@ The number of tokens minted in the first version of the contract.
 mapping(uint256 => mapping(enum IGuildPin.GuildAction => mapping(uint256 => bool))) claimerUserIds
 ```
 
+Maps whether a specific pin has been claimed to a userId.
+
 ## Functions
 
 ### initialize

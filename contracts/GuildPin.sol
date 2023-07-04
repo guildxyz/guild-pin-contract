@@ -42,6 +42,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
     /// @notice The number of tokens minted in the first version of the contract.
     uint256 internal initialTokensMinted;
 
+    /// @notice Maps whether a specific pin has been claimed to a userId.
     mapping(uint256 userId => mapping(GuildAction action => mapping(uint256 guildId => bool claimed)))
         internal claimerUserIds;
 
