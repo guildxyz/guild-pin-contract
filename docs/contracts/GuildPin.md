@@ -162,11 +162,15 @@ function setValidSigner(
 ) external
 ```
 
+Sets the address that signs the metadata.
+
+Callable only by the owner.
+
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `newValidSigner` | address |  |
+| `newValidSigner` | address | The new address of validSigner. |
 
 ### updateImageURI
 
@@ -181,7 +185,7 @@ function updateImageURI(
 
 Updates a minted token's cid.
 
-Only callable by the owner of the token.
+Callable only by the owner of the token.
 
 #### Parameters
 
@@ -203,7 +207,7 @@ function setPinStrings(
 
 Set the pretty strings displayed in metadata for name and description.
 
-Only callable by the owner.
+Callable only by the owner.
 
 #### Parameters
 

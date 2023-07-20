@@ -126,6 +126,24 @@ Burns a token from the sender.
 | `guildAction` | enum IGuildPin.GuildAction | The action to which the token belongs to. |
 | `guildId` | uint256 | The id of the guild where the token belongs to. |
 
+### setValidSigner
+
+```solidity
+function setValidSigner(
+    address newValidSigner
+) external
+```
+
+Sets the address that signs the metadata.
+
+Callable only by the owner.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `newValidSigner` | address | The new address of validSigner. |
+
 ### updateImageURI
 
 ```solidity
@@ -139,7 +157,7 @@ function updateImageURI(
 
 Updates a minted token's cid.
 
-Only callable by the owner of the token.
+Callable only by the owner of the token.
 
 #### Parameters
 
@@ -161,7 +179,7 @@ function setPinStrings(
 
 Set the pretty strings displayed in metadata for name and description.
 
-Only callable by the owner.
+Callable only by the owner.
 
 #### Parameters
 

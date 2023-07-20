@@ -90,8 +90,13 @@ interface IGuildPin {
     /// @param guildId The id of the guild where the token belongs to.
     function burn(uint256 userId, GuildAction guildAction, uint256 guildId) external;
 
+    /// @notice Sets the address that signs the metadata.
+    /// @dev Callable only by the owner.
+    /// @param newValidSigner The new address of validSigner.
+    function setValidSigner(address newValidSigner) external;
+
     /// @notice Updates a minted token's cid.
-    /// @dev Only callable by the owner of the token.
+    /// @dev Callable only by the owner of the token.
     /// @param pinData The Guild-related data, see {PinDataParams}.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param newCid The new cid that points to the updated image.
@@ -104,7 +109,7 @@ interface IGuildPin {
     ) external;
 
     /// @notice Set the pretty strings displayed in metadata for name and description.
-    /// @dev Only callable by the owner.
+    /// @dev Callable only by the owner.
     /// @param guildAction The action the strings are set for.
     /// @param pinStrings The strings to set. See {PinStrings}.
     function setPinStrings(GuildAction guildAction, PinStrings memory pinStrings) external;
