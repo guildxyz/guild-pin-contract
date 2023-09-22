@@ -36,9 +36,9 @@ interface IGuildPin {
     struct PinStrings {
         // "Joined", "Created", "Admin of"
         string actionName;
-        // "This is an on-chain proof that you joined",
-        // "This is an on-chain proof that you're the owner of",
-        // "This is an on-chain proof that you're an admin of",
+        // "This is an onchain proof that you joined",
+        // "This is an onchain proof that you're the owner of",
+        // "This is an onchain proof that you're an admin of",
         string description;
     }
 

@@ -50,9 +50,9 @@ let chainId: BigNumberish;
 const pinStrings = (action: GuildAction) => {
   const actionNames = ["Joined", "Created", "Admin of"];
   const descriptions = [
-    "This is an on-chain proof that you joined",
-    "This is an on-chain proof that you're the owner of",
-    "This is an on-chain proof that you're an admin of"
+    "This is an onchain proof that you joined",
+    "This is an onchain proof that you're the owner of",
+    "This is an onchain proof that you're an admin of"
   ];
   return {
     actionName: actionNames[action],
@@ -631,7 +631,7 @@ describe("GuildPin", () => {
         const decodedTokenURI = decodeTokenURI(tokenURI);
         expect(decodedTokenURI).to.contain(`"name": "Joined ${sampleGuildName}"`);
         expect(decodedTokenURI).to.contain(
-          `"description": "This is an on-chain proof that you joined ${sampleGuildName} on Guild.xyz."`
+          `"description": "This is an onchain proof that you joined ${sampleGuildName} on Guild.xyz."`
         );
       });
 
