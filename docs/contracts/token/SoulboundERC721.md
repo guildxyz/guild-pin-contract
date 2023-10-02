@@ -38,6 +38,25 @@ See {IERC165-supportsInterface}.
 | :--- | :--- | :---------- |
 | `interfaceId` | bytes4 |  |
 
+### locked
+
+```solidity
+function locked(
+    uint256 tokenId
+) external returns (bool)
+```
+
+Returns the locking status of an Soulbound Token
+
+SBTs assigned to zero address are considered invalid, and queries
+about them do throw.
+
+#### Parameters
+
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| `tokenId` | uint256 | The identifier for an SBT. |
+
 ### approve
 
 ```solidity
@@ -165,6 +184,20 @@ Still used for minting/burning.
 | `batchSize` | uint256 |  |
 
 ## Custom errors
+
+### NonExistentToken
+
+```solidity
+error NonExistentToken(uint256 tokenId)
+```
+
+Error thrown when trying to query info about a token that's not (yet) minted.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | The queried id. |
 
 ### Soulbound
 
