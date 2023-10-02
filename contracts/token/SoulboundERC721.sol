@@ -19,6 +19,10 @@ contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable, IERC
     /// @notice Empty space reserved for future updates.
     uint256[50] private __gap;
 
+    /// @notice Error thrown when trying to query info about a token that's not (yet) minted.
+    /// @param tokenId The queried id.
+    error NonExistentToken(uint256 tokenId);
+
     /// @notice Error thrown when a function's execution is not possible, because this is a soulbound NFT.
     error Soulbound();
 
@@ -39,7 +43,8 @@ contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable, IERC
             super.supportsInterface(interfaceId);
     }
 
-    function locked(uint256) external pure returns (bool) {
+    function locked(uint256 tokenId) external view returns (bool) {
+        if (!_exists(tokenId)) revert NonExistentToken(tokenId);
         return true;
     }
 

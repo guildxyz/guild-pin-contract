@@ -135,9 +135,35 @@ describe("GuildPin", () => {
   });
 
   context("Soulbound", () => {
-    it("should implement ERC5192", async () => {
+    let timestamp: number;
+    let signature: string;
+
+    before("get time", () => {
+      timestamp = Math.floor(Date.now() / 1000);
+    });
+
+    beforeEach("create signature, set strings", async () => {
+      await pin.setPinStrings(GuildAction.JOINED_GUILD, pinStrings(GuildAction.JOINED_GUILD));
+      await pin.setPinStrings(GuildAction.IS_OWNER, pinStrings(GuildAction.IS_OWNER));
+      await pin.setPinStrings(GuildAction.IS_ADMIN, pinStrings(GuildAction.IS_ADMIN));
+
+      signature = await createSignature(
+        signer,
+        wallet0.address,
+        GuildAction.JOINED_GUILD,
+        sampleUserId,
+        sampleGuildId,
+        sampleGuildName,
+        sampleJoinDate,
+        timestamp,
+        cids[0],
+        chainId,
+        await pin.getAddress()
+      );
+    });
+
+    it("should support ERC5192 interface", async () => {
       expect(await pin.supportsInterface("0xb45a3c0e")).to.eq(true);
-      expect(await pin.locked(0)).to.eq(true);
     });
 
     it("should revert if approval/transfer-related functions are called", async () => {
@@ -162,6 +188,23 @@ describe("GuildPin", () => {
           ethers.ZeroHash
         )
       ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+    });
+
+    it("should have a locked function that throws for minted tokens", async () => {
+      const tokenId = 1;
+      await expect(pin.locked(tokenId)).to.be.revertedWithCustomError(GuildPin, "NonExistentToken").withArgs(tokenId);
+    });
+
+    it("should have a locked function that returns true for minted tokens", async () => {
+      await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee });
+      expect(await pin.locked(1)).to.eq(true);
+    });
+
+    it("should emit Locked event when minting", async () => {
+      const tokenId = (await pin.totalSupply()) + 1n;
+      await expect(pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee }))
+        .to.emit(pin, "Locked")
+        .withArgs(tokenId);
     });
   });
 
@@ -547,13 +590,6 @@ describe("GuildPin", () => {
         });
         expect(await pin.balanceOf(wallet0.address)).to.eq(1);
         expect(await pin.ownerOf(tokenId)).to.eq(wallet0.address);
-      });
-
-      it("should emit Locked event (ERC5192)", async () => {
-        const tokenId = (await pin.totalSupply()) + 1n;
-        await expect(pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, { value: fee }))
-          .to.emit(pin, "Locked")
-          .withArgs(tokenId);
       });
 
       it("should emit Claimed event", async () => {
