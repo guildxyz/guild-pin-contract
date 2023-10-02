@@ -134,23 +134,35 @@ describe("GuildPin", () => {
     expect(await upgraded.treasury()).to.eq(treasury.address);
   });
 
-  it("should be soulbound", async () => {
-    await expect(pin.approve(wallet0.address, 0)).to.be.revertedWithCustomError(GuildPin, "Soulbound");
-    await expect(pin.setApprovalForAll(wallet0.address, true)).to.be.revertedWithCustomError(GuildPin, "Soulbound");
-    await expect(pin.isApprovedForAll(wallet0.address, randomWallet.address)).to.be.revertedWithCustomError(
-      GuildPin,
-      "Soulbound"
-    );
-    await expect(pin.transferFrom(wallet0.address, randomWallet.address, 0)).to.be.revertedWithCustomError(
-      GuildPin,
-      "Soulbound"
-    );
-    await expect(
-      pin["safeTransferFrom(address,address,uint256)"](wallet0.address, randomWallet.address, 0)
-    ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
-    await expect(
-      pin["safeTransferFrom(address,address,uint256,bytes)"](wallet0.address, randomWallet.address, 0, ethers.ZeroHash)
-    ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+  context("Soulbound", () => {
+    it("should implement ERC5192", async () => {
+      expect(await pin.supportsInterface("0xb45a3c0e")).to.eq(true);
+      expect(await pin.locked(0)).to.eq(true);
+    });
+
+    it("should revert if approval/transfer-related functions are called", async () => {
+      await expect(pin.approve(wallet0.address, 0)).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+      await expect(pin.setApprovalForAll(wallet0.address, true)).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+      await expect(pin.isApprovedForAll(wallet0.address, randomWallet.address)).to.be.revertedWithCustomError(
+        GuildPin,
+        "Soulbound"
+      );
+      await expect(pin.transferFrom(wallet0.address, randomWallet.address, 0)).to.be.revertedWithCustomError(
+        GuildPin,
+        "Soulbound"
+      );
+      await expect(
+        pin["safeTransferFrom(address,address,uint256)"](wallet0.address, randomWallet.address, 0)
+      ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+      await expect(
+        pin["safeTransferFrom(address,address,uint256,bytes)"](
+          wallet0.address,
+          randomWallet.address,
+          0,
+          ethers.ZeroHash
+        )
+      ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
+    });
   });
 
   context("Treasury management", () => {
@@ -535,6 +547,13 @@ describe("GuildPin", () => {
         });
         expect(await pin.balanceOf(wallet0.address)).to.eq(1);
         expect(await pin.ownerOf(tokenId)).to.eq(wallet0.address);
+      });
+
+      it("should emit Locked event (ERC5192)", async () => {
+        const tokenId = (await pin.totalSupply()) + 1n;
+        await expect(pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, { value: fee }))
+          .to.emit(pin, "Locked")
+          .withArgs(tokenId);
       });
 
       it("should emit Claimed event", async () => {
