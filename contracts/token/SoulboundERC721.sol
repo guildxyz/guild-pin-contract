@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 /* solhint-disable max-line-length */
 
 import { IERC4906 } from "../interfaces/IERC4906.sol";
+import { IERC5192 } from "../interfaces/IERC5192.sol";
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import { IERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import { ERC721EnumerableUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
@@ -14,7 +15,7 @@ import { IERC165Upgradeable } from "@openzeppelin/contracts-upgradeable/utils/in
 
 /// @title An enumerable soulbound ERC721.
 /// @notice Allowance and transfer-related functions are disabled.
-contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable, IERC4906 {
+contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable, IERC4906, IERC5192 {
     /// @notice Empty space reserved for future updates.
     uint256[50] private __gap;
 
@@ -33,8 +34,13 @@ contract SoulboundERC721 is ERC721Upgradeable, ERC721EnumerableUpgradeable, IERC
     ) public view virtual override(ERC721EnumerableUpgradeable, ERC721Upgradeable, IERC165Upgradeable) returns (bool) {
         return
             interfaceId == 0x49064906 || // ERC4906
+            interfaceId == type(IERC5192).interfaceId ||
             interfaceId == type(IERC721EnumerableUpgradeable).interfaceId ||
             super.supportsInterface(interfaceId);
+    }
+
+    function locked(uint256) external pure returns (bool) {
+        return true;
     }
 
     function approve(
