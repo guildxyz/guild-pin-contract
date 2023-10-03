@@ -117,6 +117,8 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
 
         _safeMint(pinData.receiver, tokenId);
 
+        emit Locked(tokenId);
+
         emit Claimed(pinData.receiver, pinData.guildAction, pinData.guildId);
     }
 

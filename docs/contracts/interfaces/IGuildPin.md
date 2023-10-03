@@ -305,20 +305,6 @@ error IncorrectSignature()
 
 Error thrown when the supplied signature is invalid.
 
-### NonExistentToken
-
-```solidity
-error NonExistentToken(uint256 tokenId)
-```
-
-Error thrown when trying to query info about a token that's not (yet) minted.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| tokenId | uint256 | The queried id. |
-
 ## Custom types
 
 ### GuildAction
