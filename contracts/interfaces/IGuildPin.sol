@@ -71,14 +71,16 @@ interface IGuildPin {
 
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.
-    /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
     /// @param pinData The Guild-related data, see {PinDataParams}.
+    /// @param adminTreasury The address where the pinned guild collects fees paid to them.
+    /// @param adminFee The fee to pay to the guild where the Pin is minted.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
     /// @param signature The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address.
     function claim(
-        address payToken,
         PinDataParams memory pinData,
+        address payable adminTreasury,
+        uint256 adminFee,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
