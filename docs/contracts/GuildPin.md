@@ -112,8 +112,9 @@ Sets metadata and the associated addresses.
 
 ```solidity
 function claim(
-    address payToken,
     struct IGuildPin.PinDataParams pinData,
+    address payable adminTreasury,
+    uint256 adminFee,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -128,8 +129,9 @@ The contract needs to be approved if ERC20 tokens are used.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
+| `adminTreasury` | address payable | The address where the pinned guild collects fees paid to them. |
+| `adminFee` | uint256 | The fee to pay to the guild where the Pin is minted. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 | `signature` | bytes | The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address. |
@@ -303,6 +305,8 @@ function _authorizeUpgrade(
 ```solidity
 function isValidSignature(
     struct IGuildPin.PinDataParams pinData,
+    address payable adminTreasury,
+    uint256 adminFee,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -316,6 +320,8 @@ Checks the validity of the signature for the given params.
 | Name | Type | Description |
 | :--- | :--- | :---------- |
 | `pinData` | struct IGuildPin.PinDataParams |  |
+| `adminTreasury` | address payable |  |
+| `adminFee` | uint256 |  |
 | `signedAt` | uint256 |  |
 | `cid` | string |  |
 | `signature` | bytes |  |
