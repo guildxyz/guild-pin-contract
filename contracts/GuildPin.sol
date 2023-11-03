@@ -85,9 +85,6 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         ) revert AlreadyClaimed();
         if (!isValidSignature(pinData, signedAt, cid, signature)) revert IncorrectSignature();
 
-        uint256 fee = fee[payToken];
-        if (fee == 0) revert IncorrectPayToken(payToken);
-
         uint256 tokenId = totalSupply() + 1;
 
         unchecked {
@@ -109,10 +106,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         claimerUserIds[pinData.userId][pinData.guildAction][pinData.guildId] = true;
 
         // Fee collection
-        // When there is no msg.value, try transferring ERC20
-        // When there is msg.value, ensure it's the correct amount
-        if (msg.value == 0) treasury.sendTokenFrom(msg.sender, payToken, fee);
-        else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
+        if (msg.value != fee) revert IncorrectFee(msg.value, fee);
         else treasury.sendEther(fee);
 
         _safeMint(pinData.receiver, tokenId);
