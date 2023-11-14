@@ -606,6 +606,15 @@ describe("GuildPin", () => {
         });
       });
 
+      it("should revert when trying to burn a non-existent token", async () => {
+        const guildId = sampleGuildId + 1;
+        const hasClaimed = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, guildId);
+        expect(hasClaimed).to.eq(false);
+        await expect(pin.burn(sampleUserId, GuildAction.JOINED_GUILD, guildId)).to.be.revertedWith(
+          "ERC721: invalid token ID"
+        );
+      });
+
       it("should reset hasClaimed to false", async () => {
         const hasClaimed0 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
         await pin.burn(sampleUserId, GuildAction.JOINED_GUILD, sampleGuildId);
@@ -677,7 +686,7 @@ describe("GuildPin", () => {
 
     context("#tokenURI", () => {
       it("should revert when trying to get the tokenURI for a non-existent token", async () => {
-        await expect(pin.tokenURI(84)).to.revertedWithCustomError(pin, "NonExistentToken").withArgs(84);
+        await expect(pin.tokenURI(84)).to.be.revertedWithCustomError(pin, "NonExistentToken").withArgs(84);
       });
 
       it("should include the pretty strings", async () => {
