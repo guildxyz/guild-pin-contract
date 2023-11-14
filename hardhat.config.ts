@@ -56,7 +56,7 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     base: {
-      url: "https://base-mainnet.public.blastapi.io",
+      url: "https://base.llamarpc.com",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     optimism: {
