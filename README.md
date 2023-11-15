@@ -41,6 +41,7 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `base` (Base Mainnet)
 - `optimism` (Optimism Mainnet)
 - `zksync` (zkSync Era Mainnet)
+- `cronos` (Cronos Mainnet)
 
 ## Verification
 

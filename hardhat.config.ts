@@ -94,6 +94,10 @@ const config: HardhatUserConfig = {
       ethNetwork: `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`,
       verifyURL: "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
       zksync: true
+    },
+    cronos: {
+      url: "https://cronos-evm.publicnode.com",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     }
   },
   gasReporter: {

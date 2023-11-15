@@ -15,15 +15,10 @@ Returns the address that receives the fees.
 ### fee
 
 ```solidity
-mapping(address => uint256) fee
+uint256 fee
 ```
 
 The minting fee of a token.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
 
 #### Return Values
 
@@ -50,12 +45,11 @@ function __TreasuryManager_init(
 
 ```solidity
 function setFee(
-    address token,
     uint256 newFee
 ) external
 ```
 
-Sets the minting fee for a given token used for paying.
+Sets the minting fee forwarded to Guild's treasury.
 
 Callable only by the owner.
 
@@ -63,7 +57,6 @@ Callable only by the owner.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `token` | address | The token whose fee is set. |
 | `newFee` | uint256 | The new fee in base units. |
 
 ### setTreasury
