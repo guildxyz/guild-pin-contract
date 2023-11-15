@@ -67,9 +67,8 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         __TreasuryManager_init(treasury);
     }
 
-    // Note: the reInitialize function was last used with version 2
-    // function reInitialize() public reinitializer(2) {
-    // }
+    // Note: the reInitialize function was last used with version 3
+    // function reInitialize() public reinitializer(3) {}
 
     function claim(
         PinDataParams memory pinData,
