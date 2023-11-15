@@ -9,7 +9,7 @@ enum GuildAction {
   IS_ADMIN
 }
 
-// NFT CONFIG
+// NFT config
 const name = "Guild Pin";
 const symbol = "GUILD";
 const cids = [
@@ -20,9 +20,9 @@ const cids = [
   "QmW5sPVbZDueZwvSuibteAwDFwFXhF8gebfptGBx1DZq1j"
 ];
 const fee = ethers.parseEther("0.1");
+const adminFee = ethers.parseEther("0.05");
 
-// CONTRACTS
-let mockERC20: Contract;
+// Contract
 let GuildPin: ContractFactory;
 let pin: Contract;
 
@@ -30,8 +30,10 @@ let pin: Contract;
 let wallet0: SignerWithAddress;
 let randomWallet: SignerWithAddress;
 let treasury: SignerWithAddress;
+let adminTreasury: SignerWithAddress;
 let signer: SignerWithAddress;
 
+// Sample Pin data
 const sampleJoinDate = 1682582503;
 const sampleUserId = 42;
 const sampleGuildId = 1985;
@@ -68,14 +70,42 @@ const createSignature = async (
   guildId: BigNumberish,
   guildName: string,
   createdAt: BigNumberish,
+  adminTreasuryAddress: string,
+  adminFeeAmount: BigNumberish,
   signedAt: BigNumberish,
   cid: string,
   chainid: BigNumberish,
   pinAddress: string
 ) => {
   const payload = ethers.AbiCoder.defaultAbiCoder().encode(
-    ["address", "uint8", "uint256", "uint256", "string", "uint256", "uint256", "string", "uint256", "address"],
-    [receiver, guildAction, userId, guildId, guildName, createdAt, signedAt, cid, chainid, pinAddress]
+    [
+      "address",
+      "uint8",
+      "uint256",
+      "uint256",
+      "string",
+      "uint256",
+      "address payable",
+      "uint256",
+      "uint256",
+      "string",
+      "uint256",
+      "address"
+    ],
+    [
+      receiver,
+      guildAction,
+      userId,
+      guildId,
+      guildName,
+      createdAt,
+      adminTreasuryAddress,
+      adminFeeAmount,
+      signedAt,
+      cid,
+      chainid,
+      pinAddress
+    ]
   );
   const payloadHash = ethers.keccak256(payload);
   return wallet.signMessage(ethers.getBytes(payloadHash));
@@ -84,8 +114,8 @@ const createSignature = async (
 const decodeTokenURI = (tokenURI: string) => Buffer.from(tokenURI.slice(29), "base64").toString("utf-8");
 
 describe("GuildPin", () => {
-  before("get accounts, setup variables, deploy ERC20", async () => {
-    [wallet0, randomWallet, treasury, signer] = await ethers.getSigners();
+  before("get accounts, setup variables", async () => {
+    [wallet0, randomWallet, treasury, adminTreasury, signer] = await ethers.getSigners();
 
     samplePinData = {
       receiver: wallet0.address,
@@ -97,10 +127,6 @@ describe("GuildPin", () => {
     };
 
     chainId = (await ethers.provider.getNetwork()).chainId;
-
-    const ERC20 = await ethers.getContractFactory("MockERC20");
-    mockERC20 = await ERC20.deploy("Mock Token", "MCK");
-    mockERC20.mint(wallet0.address, ethers.parseEther("100"));
   });
 
   beforeEach("deploy contract", async () => {
@@ -110,8 +136,7 @@ describe("GuildPin", () => {
     });
     await pin.waitForDeployment();
 
-    pin.setFee(ethers.ZeroAddress, fee);
-    pin.setFee(mockERC20, fee);
+    pin.setFee(fee);
   });
 
   it("should have initialized the state variables", async () => {
@@ -155,6 +180,8 @@ describe("GuildPin", () => {
         sampleGuildId,
         sampleGuildName,
         sampleJoinDate,
+        adminTreasury.address,
+        adminFee,
         timestamp,
         cids[0],
         chainId,
@@ -196,13 +223,15 @@ describe("GuildPin", () => {
     });
 
     it("should have a locked function that returns true for minted tokens", async () => {
-      await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee });
+      await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], signature, { value: fee + adminFee });
       expect(await pin.locked(1)).to.eq(true);
     });
 
     it("should emit Locked event when minting", async () => {
       const tokenId = (await pin.totalSupply()) + 1n;
-      await expect(pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee }))
+      await expect(
+        pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], signature, { value: fee + adminFee })
+      )
         .to.emit(pin, "Locked")
         .withArgs(tokenId);
     });
@@ -210,24 +239,23 @@ describe("GuildPin", () => {
 
   context("Treasury management", () => {
     context("#setFee", () => {
-      it("should revert if a token's fee is attempted to be changed by anyone but the owner", async () => {
-        await expect((pin.connect(randomWallet) as Contract).setFee(ethers.ZeroAddress, 12)).to.be.revertedWith(
+      it("should revert if the fee is attempted to be changed by anyone but the owner", async () => {
+        await expect((pin.connect(randomWallet) as Contract).setFee(12)).to.be.revertedWith(
           "Ownable: caller is not the owner"
         );
       });
 
-      it("should change the tokens' fees", async () => {
-        const mockFee0 = await pin.fee(mockERC20);
-        await pin.setFee(mockERC20, 69);
-        const mockFee1 = await pin.fee(mockERC20);
+      it("should change the fee", async () => {
+        const mockFee0 = await pin.fee();
+        await pin.setFee(69);
+        const mockFee1 = await pin.fee();
         expect(mockFee0).to.not.eq(mockFee1);
         expect(mockFee1).to.eq(69);
       });
 
       it("should emit FeeChanged event", async () => {
-        const token = randomWallet.address;
         const newFee = 42;
-        await expect(pin.setFee(token, newFee)).to.emit(pin, "FeeChanged").withArgs(token, newFee);
+        await expect(pin.setFee(newFee)).to.emit(pin, "FeeChanged").withArgs(newFee);
       });
     });
 
@@ -271,6 +299,8 @@ describe("GuildPin", () => {
         sampleGuildId,
         sampleGuildName,
         sampleJoinDate,
+        adminTreasury.address,
+        adminFee,
         timestamp,
         cids[0],
         chainId,
@@ -290,28 +320,32 @@ describe("GuildPin", () => {
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
+          adminTreasury.address,
+          adminFee,
           oldTimestamp,
           cids[0],
           chainId,
           await pin.getAddress()
         );
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, oldTimestamp, cids[0], signature, { value: fee })
+          pin.claim(samplePinData, adminTreasury, adminFee, oldTimestamp, cids[0], signature, { value: fee + adminFee })
         ).to.be.revertedWithCustomError(pin, "ExpiredSignature");
       });
 
       it("should revert if the address has already claimed", async () => {
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, { value: fee })
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+            value: fee + adminFee
+          })
         ).to.be.revertedWithCustomError(pin, "AlreadyClaimed");
       });
 
       it("should revert if the userId has already claimed", async () => {
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
 
         const signature = await createSignature(
@@ -322,13 +356,14 @@ describe("GuildPin", () => {
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
+          adminTreasury.address,
+          adminFee,
           timestamp,
           cids[0],
           chainId,
           await pin.getAddress()
         );
         const tx = pin.claim(
-          ethers.ZeroAddress,
           {
             receiver: randomWallet.address,
             guildAction: GuildAction.JOINED_GUILD,
@@ -337,10 +372,12 @@ describe("GuildPin", () => {
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
           },
+          adminTreasury,
+          adminFee,
           timestamp,
           cids[0],
           signature,
-          { value: fee }
+          { value: fee + adminFee }
         );
 
         await expect(tx).to.be.revertedWithCustomError(pin, "AlreadyClaimed");
@@ -348,21 +385,22 @@ describe("GuildPin", () => {
 
       it("should revert if the signature is incorrect", async () => {
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], ethers.ZeroHash, {
-            value: fee
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], ethers.ZeroHash, {
+            value: fee + adminFee
           })
         ).to.be.revertedWithCustomError(pin, "IncorrectSignature");
 
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature.slice(0, -2), {
-            value: fee
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature.slice(0, -2), {
+            value: fee + adminFee
           })
         ).to.be.revertedWithCustomError(pin, "IncorrectSignature");
 
         await expect(
           pin.claim(
-            ethers.ZeroAddress,
             samplePinData,
+            adminTreasury,
+            adminFee,
             timestamp,
             cids[0],
             await createSignature(
@@ -373,26 +411,22 @@ describe("GuildPin", () => {
               sampleGuildId,
               sampleGuildName,
               sampleJoinDate,
+              adminTreasury.address,
+              adminFee,
               timestamp,
               cids[0],
               chainId,
               await pin.getAddress()
             ),
-            { value: fee }
+            { value: fee + adminFee }
           )
         ).to.be.revertedWithCustomError(pin, "IncorrectSignature");
       });
 
-      it("should revert if the token has no fees set", async () => {
-        await expect(pin.claim(randomWallet.address, samplePinData, timestamp, cids[0], sampleSignature))
-          .to.be.revertedWithCustomError(pin, "IncorrectPayToken")
-          .withArgs(randomWallet.address);
-      });
-
       it("should increment the total supply", async () => {
         const totalSupply0 = await pin.totalSupply();
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         const totalSupply1 = await pin.totalSupply();
         expect(totalSupply1).to.eq(totalSupply0 + 1n);
@@ -400,8 +434,8 @@ describe("GuildPin", () => {
 
       it("should set the address's claim status", async () => {
         const hasClaimed0 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         const hasClaimed1 = await pin.hasClaimed(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
         expect(hasClaimed0).to.eq(false);
@@ -414,8 +448,8 @@ describe("GuildPin", () => {
           GuildAction.JOINED_GUILD,
           sampleGuildId
         );
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         const hasTheUserIdClaimed1 = await pin.hasTheUserIdClaimed(
           sampleUserId,
@@ -427,8 +461,8 @@ describe("GuildPin", () => {
       });
 
       it("should be able to mint tokens for the same reason to different addresses", async () => {
-        const tx0 = await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        const tx0 = await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         const res0 = await tx0.wait();
         expect(res0.status).to.equal(1);
@@ -441,13 +475,14 @@ describe("GuildPin", () => {
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
+          adminTreasury.address,
+          adminFee,
           timestamp,
           cids[0],
           chainId,
           await pin.getAddress()
         );
         const tx1 = await pin.claim(
-          ethers.ZeroAddress,
           {
             receiver: randomWallet.address,
             guildAction: GuildAction.JOINED_GUILD,
@@ -456,18 +491,20 @@ describe("GuildPin", () => {
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
           },
+          adminTreasury,
+          adminFee,
           timestamp,
           cids[0],
           signature,
-          { value: fee }
+          { value: fee + adminFee }
         );
         const res1 = await tx1.wait();
         expect(res1.status).to.equal(1);
       });
 
       it("should be able to mint tokens for the same address for different reasons", async () => {
-        const tx0 = await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        const tx0 = await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         const res0 = await tx0.wait();
         expect(res0.status).to.equal(1);
@@ -480,13 +517,14 @@ describe("GuildPin", () => {
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
+          adminTreasury.address,
+          adminFee,
           timestamp,
           cids[0],
           chainId,
           await pin.getAddress()
         );
         const tx1 = await pin.claim(
-          ethers.ZeroAddress,
           {
             receiver: wallet0.address,
             guildAction: GuildAction.IS_OWNER,
@@ -495,10 +533,12 @@ describe("GuildPin", () => {
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
           },
+          adminTreasury,
+          adminFee,
           timestamp,
           cids[0],
           signature1,
-          { value: fee }
+          { value: fee + adminFee }
         );
         const res1 = await tx1.wait();
         expect(res1.status).to.equal(1);
@@ -511,13 +551,14 @@ describe("GuildPin", () => {
           sampleGuildId,
           sampleGuildName,
           sampleJoinDate,
+          adminTreasury.address,
+          adminFee,
           timestamp,
           cids[0],
           chainId,
           await pin.getAddress()
         );
         const tx2 = await pin.claim(
-          ethers.ZeroAddress,
           {
             receiver: wallet0.address,
             guildAction: GuildAction.IS_ADMIN,
@@ -526,58 +567,33 @@ describe("GuildPin", () => {
             guildName: sampleGuildName,
             createdAt: sampleJoinDate
           },
+          adminTreasury,
+          adminFee,
           timestamp,
           cids[0],
           signature2,
-          { value: fee }
+          { value: fee + adminFee }
         );
         const res2 = await tx2.wait();
         expect(res2.status).to.equal(1);
       });
 
-      it("should revert when an ERC20 transfer silently fails", async () => {
-        const BadERC20 = await ethers.getContractFactory("MockBadERC20");
-        const mockBadERC20 = await BadERC20.deploy("Mock Token", "MCK");
-        mockBadERC20.mint(wallet0.address, ethers.parseEther("100"));
-        await mockBadERC20.approve(pin, ethers.MaxUint256);
-        pin.setFee(mockBadERC20, fee);
-
-        await expect(pin.claim(mockBadERC20, samplePinData, timestamp, cids[0], sampleSignature))
-          .to.be.revertedWithCustomError(pin, "TransferFailed")
-          .withArgs(wallet0.address, await pin.getAddress());
-      });
-
-      it("should transfer ERC20 when there is no msg.value", async () => {
-        await mockERC20.approve(pin, ethers.MaxUint256);
-        await expect(pin.claim(mockERC20, samplePinData, timestamp, cids[0], sampleSignature)).to.changeTokenBalances(
-          mockERC20,
-          [wallet0, treasury],
-          [fee * -1n, fee]
-        );
-      });
-
       it("should revert if an incorrect msg.value is received", async () => {
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-            value: fee * 2n
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+            value: (fee + adminFee) * 2n
           })
         )
           .to.be.revertedWithCustomError(pin, "IncorrectFee")
-          .withArgs(fee * 2n, fee);
-
-        await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-            value: fee * 2n
-          })
-        )
-          .to.be.revertedWithCustomError(pin, "IncorrectFee")
-          .withArgs(fee * 2n, fee);
+          .withArgs((fee + adminFee) * 2n, fee + adminFee);
       });
 
       it("should transfer ether to treasury", async () => {
         await expect(
-          pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, { value: fee })
-        ).to.changeEtherBalances([wallet0, treasury], [fee * -1n, fee]);
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+            value: fee + adminFee
+          })
+        ).to.changeEtherBalances([wallet0, treasury, adminTreasury], [(fee + adminFee) * -1n, fee, adminFee]);
       });
 
       it("should mint the token", async () => {
@@ -585,15 +601,19 @@ describe("GuildPin", () => {
         const tokenId = totalSupply + 1n;
         expect(await pin.balanceOf(wallet0.address)).to.eq(0);
         await expect(pin.ownerOf(tokenId)).to.be.revertedWith("ERC721: invalid token ID");
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
         expect(await pin.balanceOf(wallet0.address)).to.eq(1);
         expect(await pin.ownerOf(tokenId)).to.eq(wallet0.address);
       });
 
       it("should emit Claimed event", async () => {
-        await expect(pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, { value: fee }))
+        await expect(
+          pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+            value: fee + adminFee
+          })
+        )
           .to.emit(pin, "Claimed")
           .withArgs(wallet0.address, GuildAction.JOINED_GUILD, sampleGuildId);
       });
@@ -601,8 +621,8 @@ describe("GuildPin", () => {
 
     context("#burn", () => {
       beforeEach("claim a token", async () => {
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], sampleSignature, {
-          value: fee
+        await pin.claim(samplePinData, adminTreasury, adminFee, timestamp, cids[0], sampleSignature, {
+          value: fee + adminFee
         });
       });
 
@@ -658,7 +678,6 @@ describe("GuildPin", () => {
 
   context("TokenURI", () => {
     let timestamp: number;
-    let signature: string;
 
     before("get time", () => {
       timestamp = Math.floor(Date.now() / 1000);
@@ -668,20 +687,6 @@ describe("GuildPin", () => {
       await pin.setPinStrings(GuildAction.JOINED_GUILD, pinStrings(GuildAction.JOINED_GUILD));
       await pin.setPinStrings(GuildAction.IS_OWNER, pinStrings(GuildAction.IS_OWNER));
       await pin.setPinStrings(GuildAction.IS_ADMIN, pinStrings(GuildAction.IS_ADMIN));
-
-      signature = await createSignature(
-        signer,
-        wallet0.address,
-        GuildAction.JOINED_GUILD,
-        sampleUserId,
-        sampleGuildId,
-        sampleGuildName,
-        sampleJoinDate,
-        timestamp,
-        cids[0],
-        chainId,
-        await pin.getAddress()
-      );
     });
 
     context("#tokenURI", () => {
@@ -690,7 +695,31 @@ describe("GuildPin", () => {
       });
 
       it("should include the pretty strings", async () => {
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee });
+        await pin.claim(
+          samplePinData,
+          adminTreasury,
+          adminFee,
+          timestamp,
+          cids[0],
+          await createSignature(
+            signer,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            sampleUserId,
+            sampleGuildId,
+            sampleGuildName,
+            sampleJoinDate,
+            adminTreasury.address,
+            adminFee,
+            timestamp,
+            cids[0],
+            chainId,
+            await pin.getAddress()
+          ),
+          {
+            value: fee + adminFee
+          }
+        );
         const tokenURI = await pin.tokenURI(1);
         const decodedTokenURI = decodeTokenURI(tokenURI);
         expect(decodedTokenURI).to.contain(`"name": "Joined ${sampleGuildName}"`);
@@ -712,13 +741,14 @@ describe("GuildPin", () => {
             sampleGuildId,
             sampleGuildName,
             sampleJoinDate,
+            adminTreasury.address,
+            adminFee,
             timestamp,
             cids[i],
             chainId,
             await pin.getAddress()
           );
           await pin.claim(
-            ethers.ZeroAddress,
             {
               receiver: claimees[i].address,
               guildAction: GuildAction.JOINED_GUILD,
@@ -727,11 +757,13 @@ describe("GuildPin", () => {
               guildName: sampleGuildName,
               createdAt: sampleJoinDate
             },
+            adminTreasury,
+            adminFee,
             timestamp,
             cids[i],
             signaturei,
             {
-              value: fee
+              value: fee + adminFee
             }
           );
           const tokenURI = await pin.tokenURI(i + 1);
@@ -745,8 +777,50 @@ describe("GuildPin", () => {
     });
 
     context("#updateImageURI", () => {
+      let signature: string;
+
       beforeEach("claim a token", async () => {
-        await pin.claim(ethers.ZeroAddress, samplePinData, timestamp, cids[0], signature, { value: fee });
+        await pin.claim(
+          samplePinData,
+          adminTreasury,
+          adminFee,
+          timestamp,
+          cids[0],
+          await createSignature(
+            signer,
+            wallet0.address,
+            GuildAction.JOINED_GUILD,
+            sampleUserId,
+            sampleGuildId,
+            sampleGuildName,
+            sampleJoinDate,
+            adminTreasury.address,
+            adminFee,
+            timestamp,
+            cids[0],
+            chainId,
+            await pin.getAddress()
+          ),
+          {
+            value: fee + adminFee
+          }
+        );
+
+        signature = await createSignature(
+          signer,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          sampleUserId,
+          sampleGuildId,
+          sampleGuildName,
+          sampleJoinDate,
+          ethers.ZeroAddress,
+          0,
+          timestamp,
+          cids[0],
+          chainId,
+          await pin.getAddress()
+        );
       });
 
       it("should revert if the signature is expired", async () => {
@@ -780,6 +854,8 @@ describe("GuildPin", () => {
               sampleGuildId,
               sampleGuildName,
               sampleJoinDate,
+              adminTreasury.address,
+              adminFee,
               timestamp,
               cids[0],
               chainId,
@@ -798,6 +874,8 @@ describe("GuildPin", () => {
           1986,
           sampleGuildName,
           sampleJoinDate,
+          ethers.ZeroAddress,
+          0,
           timestamp,
           cids[0],
           chainId,
@@ -827,26 +905,26 @@ describe("GuildPin", () => {
       });
 
       it("should update cid", async () => {
-        const oldTokenURI = await pin.tokenURI(1);
-        await pin.updateImageURI(
-          samplePinData,
+        const altSignature = await createSignature(
+          signer,
+          wallet0.address,
+          GuildAction.JOINED_GUILD,
+          sampleUserId,
+          sampleGuildId,
+          sampleGuildName,
+          sampleJoinDate,
+          ethers.ZeroAddress,
+          0,
           timestamp,
           cids[1],
-          await createSignature(
-            signer,
-            wallet0.address,
-            GuildAction.JOINED_GUILD,
-            sampleUserId,
-            sampleGuildId,
-            sampleGuildName,
-            sampleJoinDate,
-            timestamp,
-            cids[1],
-            chainId,
-            await pin.getAddress()
-          )
+          chainId,
+          await pin.getAddress()
         );
+
+        const oldTokenURI = await pin.tokenURI(1);
+        await pin.updateImageURI(samplePinData, timestamp, cids[1], altSignature);
         const newTokenURI = await pin.tokenURI(1);
+
         expect(newTokenURI).to.not.eq(oldTokenURI);
         expect(decodeTokenURI(newTokenURI)).to.contain(cids[1]);
       });

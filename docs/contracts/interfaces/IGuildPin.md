@@ -84,8 +84,9 @@ function validSigner() external returns (address signer)
 
 ```solidity
 function claim(
-    address payToken,
     struct IGuildPin.PinDataParams pinData,
+    address payable adminTreasury,
+    uint256 adminFee,
     uint256 signedAt,
     string cid,
     bytes signature
@@ -100,8 +101,9 @@ The contract needs to be approved if ERC20 tokens are used.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `payToken` | address | The address of the token that's used for paying the minting fees. 0 for ether. |
 | `pinData` | struct IGuildPin.PinDataParams | The Guild-related data, see {PinDataParams}. |
+| `adminTreasury` | address payable | The address where the pinned guild collects fees paid to them. |
+| `adminFee` | uint256 | The fee to pay to the guild where the Pin is minted. |
 | `signedAt` | uint256 | The timestamp marking the time when the data were signed. |
 | `cid` | string | The cid used to construct the tokenURI for the token to be minted. |
 | `signature` | bytes | The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address. |
@@ -272,22 +274,6 @@ Error thrown when an incorrect amount of fee is attempted to be paid.
 | ---- | ---- | ----------- |
 | paid | uint256 | The amount of funds received. |
 | requiredAmount | uint256 | The amount of fees required for minting. |
-
-### IncorrectPayToken
-
-```solidity
-error IncorrectPayToken(address token)
-```
-
-Error thrown when such a token is attempted to be used for paying that has no fee set.
-
-_The owner should set a fee for the token to solve this issue._
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | address | The address of the token that cannot be used. |
 
 ### IncorrectSender
 

@@ -8,12 +8,11 @@ A contract that manages fee-related functionality.
 
 ```solidity
 function setFee(
-    address token,
     uint256 newFee
 ) external
 ```
 
-Sets the minting fee for a given token used for paying.
+Sets the minting fee forwarded to Guild's treasury.
 
 Callable only by the owner.
 
@@ -21,7 +20,6 @@ Callable only by the owner.
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `token` | address | The token whose fee is set. |
 | `newFee` | uint256 | The new fee in base units. |
 
 ### setTreasury
@@ -45,18 +43,10 @@ Callable only by the owner.
 ### fee
 
 ```solidity
-function fee(
-    address token
-) external returns (uint256 fee)
+function fee() external returns (uint256 fee)
 ```
 
 The minting fee of a token.
-
-#### Parameters
-
-| Name | Type | Description |
-| :--- | :--- | :---------- |
-| `token` | address | The token used for paying. |
 
 #### Return Values
 
@@ -77,18 +67,16 @@ Returns the address that receives the fees.
 
 ```solidity
 event FeeChanged(
-    address token,
     uint256 newFee
 )
 ```
 
-Event emitted when a token's fee is changed.
+Event emitted when the fee is changed.
 
 #### Parameters
 
 | Name | Type | Description |
 | :--- | :--- | :---------- |
-| `token` | address | The address of the token whose fee was changed. 0 for ether. |
 | `newFee` | uint256 | The new amount of fee in base units. |
 ### TreasuryChanged
 

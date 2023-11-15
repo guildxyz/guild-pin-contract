@@ -72,8 +72,9 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
     // }
 
     function claim(
-        address payToken,
         PinDataParams memory pinData,
+        address payable adminTreasury,
+        uint256 adminFee,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -83,10 +84,7 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
             claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId] != 0 ||
             claimerUserIds[pinData.userId][pinData.guildAction][pinData.guildId]
         ) revert AlreadyClaimed();
-        if (!isValidSignature(pinData, signedAt, cid, signature)) revert IncorrectSignature();
-
-        uint256 fee = fee[payToken];
-        if (fee == 0) revert IncorrectPayToken(payToken);
+        if (!isValidSignature(pinData, adminTreasury, adminFee, signedAt, cid, signature)) revert IncorrectSignature();
 
         uint256 tokenId = totalSupply() + 1;
 
@@ -109,11 +107,11 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         claimerUserIds[pinData.userId][pinData.guildAction][pinData.guildId] = true;
 
         // Fee collection
-        // When there is no msg.value, try transferring ERC20
-        // When there is msg.value, ensure it's the correct amount
-        if (msg.value == 0) treasury.sendTokenFrom(msg.sender, payToken, fee);
-        else if (msg.value != fee) revert IncorrectFee(msg.value, fee);
-        else treasury.sendEther(fee);
+        uint256 guildFee = fee;
+        if (msg.value == guildFee + adminFee) {
+            treasury.sendEther(guildFee);
+            if (adminTreasury != address(0)) adminTreasury.sendEther(adminFee);
+        } else revert IncorrectFee(msg.value, guildFee + adminFee);
 
         _safeMint(pinData.receiver, tokenId);
 
@@ -145,7 +143,8 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
         bytes calldata signature
     ) external {
         if (signedAt < block.timestamp - SIGNATURE_VALIDITY) revert ExpiredSignature();
-        if (!isValidSignature(pinData, signedAt, newCid, signature)) revert IncorrectSignature();
+        if (!isValidSignature(pinData, payable(address(0)), 0, signedAt, newCid, signature))
+            revert IncorrectSignature();
 
         uint256 tokenId = claimedTokens[pinData.receiver][pinData.guildAction][pinData.guildId];
         if (tokenId == 0) revert NonExistentToken(tokenId);
@@ -222,6 +221,8 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
     /// @notice Checks the validity of the signature for the given params.
     function isValidSignature(
         PinDataParams memory pinData,
+        address payable adminTreasury,
+        uint256 adminFee,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -235,6 +236,8 @@ contract GuildPin is IGuildPin, Initializable, OwnableUpgradeable, UUPSUpgradeab
                 pinData.guildId,
                 pinData.guildName,
                 pinData.createdAt,
+                adminTreasury,
+                adminFee,
                 signedAt,
                 cid,
                 block.chainid,

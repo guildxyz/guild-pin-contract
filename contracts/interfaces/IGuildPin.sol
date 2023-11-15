@@ -71,14 +71,16 @@ interface IGuildPin {
 
     /// @notice Claims tokens to the given address.
     /// @dev The contract needs to be approved if ERC20 tokens are used.
-    /// @param payToken The address of the token that's used for paying the minting fees. 0 for ether.
     /// @param pinData The Guild-related data, see {PinDataParams}.
+    /// @param adminTreasury The address where the pinned guild collects fees paid to them.
+    /// @param adminFee The fee to pay to the guild where the Pin is minted.
     /// @param signedAt The timestamp marking the time when the data were signed.
     /// @param cid The cid used to construct the tokenURI for the token to be minted.
     /// @param signature The following signed by validSigner: pinData, signedAt, cid, chainId, the contract's address.
     function claim(
-        address payToken,
         PinDataParams memory pinData,
+        address payable adminTreasury,
+        uint256 adminFee,
         uint256 signedAt,
         string calldata cid,
         bytes calldata signature
@@ -138,11 +140,6 @@ interface IGuildPin {
     /// @param paid The amount of funds received.
     /// @param requiredAmount The amount of fees required for minting.
     error IncorrectFee(uint256 paid, uint256 requiredAmount);
-
-    /// @notice Error thrown when such a token is attempted to be used for paying that has no fee set.
-    /// @dev The owner should set a fee for the token to solve this issue.
-    /// @param token The address of the token that cannot be used.
-    error IncorrectPayToken(address token);
 
     /// @notice Error thrown when the sender is not permitted to do a specific action.
     error IncorrectSender();
