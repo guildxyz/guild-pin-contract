@@ -60,7 +60,7 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     optimism: {
-      url: "https://optimism-mainnet.public.blastapi.io",
+      url: "https://optimism.llamarpc.com",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     cronos: {
