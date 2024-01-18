@@ -54,6 +54,14 @@ npx hardhat verify [contractAddress] [constructorArguments] --network [networkNa
 
 For more detailed instructions, check out it's documentation [here](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#usage).
 
+## Setup
+
+To set up the contract after initial deployment, you can use the _[setup-pin](scripts/setup-pin.ts)_ script. Set the parameters at the beginning of the script, then run it using the following command:
+
+```bash
+npx hardhat run scripts/setup-pin.ts --network [networkName]
+```
+
 ## Linting
 
 The project uses [Solhint](https://github.com/protofire/solhint) for Solidity smart contracts and [ESLint](https://eslint.org) for TypeScript files. To lint all files, simply execute:
