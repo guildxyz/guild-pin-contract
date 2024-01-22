@@ -3,4 +3,6 @@ artifacts
 cache
 coverage*
 gasReporterOutput.json
+docs/contracts
 docs/templates
+.openzeppelin

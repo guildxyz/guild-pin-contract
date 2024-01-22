@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "docgen": "hardhat docgen",
+    "format": "prettier --write .",
     "lint-contracts": "solhint --max-warnings 0 'contracts/**/*.sol'",
     "lint-ts": "eslint --max-warnings 0 '**/*.{js,ts}'",
     "lint": "npm run lint-contracts && npm run lint-ts",
