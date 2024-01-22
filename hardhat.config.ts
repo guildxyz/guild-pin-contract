@@ -3,9 +3,8 @@ import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-upgradable";
 import "@nomicfoundation/hardhat-chai-matchers";
-// import "@nomicfoundation/hardhat-verify";
 import "@matterlabs/hardhat-zksync-verify";
-import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
 import "dotenv/config";
 import "hardhat-gas-reporter";
@@ -15,15 +14,6 @@ import "solidity-docgen";
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.19",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
-    }
-  },
-  zksolc: {
-    version: "1.3.14",
     settings: {
       optimizer: {
         enabled: true,
@@ -84,20 +74,31 @@ const config: HardhatUserConfig = {
       zksync: false
     },
     optimism: {
-      url: "https://optimism-mainnet.public.blastapi.io",
+      url: "https://optimism.llamarpc.com",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
     },
     zksync: {
       url: "https://mainnet.era.zksync.io",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      ethNetwork: `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      ethNetwork: "ethereum",
       verifyURL: "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
       zksync: true
     },
     cronos: {
       url: "https://cronos-evm.publicnode.com",
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
+    },
+    mantle: {
+      url: "https://rpc.mantle.xyz",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
+    },
+    ontology: {
+      url: "https://dappnode2.ont.io:10339",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {

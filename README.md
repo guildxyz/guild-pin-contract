@@ -42,6 +42,8 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `optimism` (Optimism Mainnet)
 - `zksync` (zkSync Era Mainnet)
 - `cronos` (Cronos Mainnet)
+- `mantle` (Mantle Network Mainnet)
+- `ontology` (Ontology EVM Mainnet)
 
 ## Verification
 
@@ -52,6 +54,14 @@ npx hardhat verify [contractAddress] [constructorArguments] --network [networkNa
 ```
 
 For more detailed instructions, check out it's documentation [here](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#usage).
+
+## Setup
+
+To set up the contract after initial deployment, you can use the _[setup-pin](scripts/setup-pin.ts)_ script. Set the parameters at the beginning of the script, then run it using the following command:
+
+```bash
+npx hardhat run scripts/setup-pin.ts --network [networkName]
+```
 
 ## Linting
 

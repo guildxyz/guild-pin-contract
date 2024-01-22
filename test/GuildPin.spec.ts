@@ -217,7 +217,7 @@ describe("GuildPin", () => {
       ).to.be.revertedWithCustomError(GuildPin, "Soulbound");
     });
 
-    it("should have a locked function that throws for minted tokens", async () => {
+    it("should have a locked function that throws for not minted tokens", async () => {
       const tokenId = 1;
       await expect(pin.locked(tokenId)).to.be.revertedWithCustomError(GuildPin, "NonExistentToken").withArgs(tokenId);
     });
