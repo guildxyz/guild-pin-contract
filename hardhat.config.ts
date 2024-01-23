@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-upgradable";

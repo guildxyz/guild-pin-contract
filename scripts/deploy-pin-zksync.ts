@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import "dotenv/config";
 import * as hre from "hardhat";
