@@ -17,7 +17,6 @@ async function main() {
   });
 
   console.log(`Upgrading ${contractName} on zkSync...`);
-  console.log(`Tx hash: ${guildPin.deploymentTransaction()?.hash}`);
 
   await guildPin.waitForDeployment();
 

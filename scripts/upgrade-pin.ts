@@ -13,7 +13,6 @@ async function main() {
 
   const network = await ethers.provider.getNetwork();
   console.log(`Upgrading ${contractName} on ${network.name !== "unknown" ? network.name : network.chainId}...`);
-  console.log(`Tx hash: ${guildPin.deploymentTransaction()?.hash}`);
 
   await guildPin.waitForDeployment();
 
