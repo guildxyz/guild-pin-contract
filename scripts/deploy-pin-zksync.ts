@@ -1,4 +1,7 @@
-import { ethers, upgrades } from "hardhat";
+import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
+import "dotenv/config";
+import * as hre from "hardhat";
+import { Wallet } from "zksync-ethers";
 
 // CONFIG
 const name = ""; // The name of the token.
@@ -9,13 +12,21 @@ const validSigner = "0x..."; // The address that signs the parameters for claimi
 async function main() {
   const contractName = "GuildPin";
 
-  const GuildPin = await ethers.getContractFactory(contractName);
-  const guildPin = await upgrades.deployProxy(GuildPin, [name, symbol, treasury, validSigner], {
-    kind: "uups"
-  });
+  const zkWallet = new Wallet(process.env.PRIVATE_KEY!);
 
-  const network = await ethers.provider.getNetwork();
-  console.log(`Deploying ${contractName} to ${network.name !== "unknown" ? network.name : network.chainId}...`);
+  const deployer = new Deployer(hre, zkWallet);
+
+  const contract = await deployer.loadArtifact(contractName);
+  const guildPin = await hre.zkUpgrades.deployProxy(
+    deployer.zkWallet,
+    contract,
+    [name, symbol, treasury, validSigner],
+    {
+      initializer: "initialize"
+    }
+  );
+
+  console.log(`Deploying ${contractName} to zkSync...`);
   console.log(`Tx hash: ${guildPin.deploymentTransaction()?.hash}`);
 
   await guildPin.waitForDeployment();
