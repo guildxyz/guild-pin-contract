@@ -53,7 +53,7 @@ const config: HardhatUserConfig = {
       zksync: false
     },
     mumbai: {
-      url: `https://matic-mumbai.chainstacklabs.com`,
+      url: `https://polygon-mumbai-pokt.nodies.app`,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
     },
