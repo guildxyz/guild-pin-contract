@@ -98,6 +98,11 @@ const config: HardhatUserConfig = {
       url: "https://dappnode2.ont.io:10339",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    linea: {
+      url: "https://linea.decubate.com",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
