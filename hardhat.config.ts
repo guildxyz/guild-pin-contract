@@ -85,7 +85,7 @@ const config: HardhatUserConfig = {
       zksync: true
     },
     cronos: {
-      url: "https://cronos-evm.publicnode.com",
+      url: "https://cronos.drpc.org",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
     },
