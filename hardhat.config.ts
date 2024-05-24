@@ -103,6 +103,11 @@ const config: HardhatUserConfig = {
       url: "https://linea.decubate.com",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    cyber: {
+      url: "https://cyber.alt.technology",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
