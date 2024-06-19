@@ -161,8 +161,95 @@ const config: HardhatUserConfig = {
     showTimeSpent: true
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY || "",
+      bsc: process.env.BSCSCAN_API_KEY || "",
+      polygon: process.env.POLYGONSCAN_API_KEY || "",
+      gnosis: process.env.GNOSISSCAN_API_KEY || "",
+      arbitrumOne: process.env.ARBISCAN_API_KEY || "",
+      base: process.env.BASESCAN_API_KEY || "",
+      optimisticEthereum: process.env.OPTIMISTICSCAN_API_KEY || "",
+      cronos: process.env.CRONOSCAN_API_KEY || "",
+      mantle: process.env.MANTLESCAN_API_KEY || "",
+      // ontology: "", // no etherscan
+      linea: process.env.LINEASCAN_API_KEY || "",
+      // cyber: "", // no etherscan
+      taiko: process.env.TAIKOSCAN_API_KEY || "",
+      blast: process.env.BLASTSCAN_API_KEY || "",
+      xlayer: process.env.OKLINK_API_KEY || "",
+      coredao: process.env.COREDAOSCAN_API_KEY || "",
+      metis: "metis",
+      neon: "neon",
+      polygonZkEVM: process.env.ZKEVM_POLYGONSCAN_API_KEY || "",
+      scroll: process.env.SCROLLSCAN_API_KEY || ""
+      // zeta: "", // no etherscan
+    },
+    customChains: [
+      {
+        network: "cronos",
+        chainId: 25,
+        urls: { apiURL: "https://api.cronoscan.com/api", browserURL: "https://cronoscan.com" }
+      },
+      {
+        network: "mantle",
+        chainId: 5000,
+        urls: { apiURL: "https://api.mantlescan.xyz/api", browserURL: "https://mantlescan.xyz" }
+      },
+      {
+        network: "linea",
+        chainId: 59144,
+        urls: { apiURL: "https://api.lineascan.build/api", browserURL: "https://lineascan.build" }
+      },
+      {
+        network: "taiko",
+        chainId: 167000,
+        urls: { apiURL: "https://api.taikoscan.io/api", browserURL: "https://taikoscan.io" }
+      },
+      {
+        network: "blast",
+        chainId: 81457,
+        urls: { apiURL: "https://api.blastscan.io/api", browserURL: "https://blastscan.io" }
+      },
+      {
+        network: "xlayer",
+        chainId: 196,
+        urls: {
+          apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/XLAYER",
+          browserURL: "https://oklink.con"
+        }
+      },
+      {
+        network: "coredao",
+        chainId: 1116,
+        urls: { apiURL: "https://openapi.coredao.org/api", browserURL: "https://scan.coredao.org" }
+      },
+      {
+        network: "metis",
+        chainId: 1088,
+        urls: {
+          apiURL: "https://api.routescan.io/v2/network/mainnet/evm/1088/etherscan",
+          browserURL: "https://explorer.metis.io"
+        }
+      },
+      {
+        network: "neon",
+        chainId: 245022934,
+        urls: {
+          apiURL: "https://api.neonscan.org/hardhat/verify",
+          browserURL: "https://neonscan.org"
+        }
+      },
+      {
+        network: "scroll",
+        chainId: 534352,
+        urls: {
+          apiURL: "https://api.scrollscan.com/api",
+          browserURL: "https://scrollscan.com"
+        }
+      }
+    ]
   },
+  sourcify: { enabled: false },
   docgen: { pages: "files", outputDir: "./docs/contracts", templates: "./docs/templates" }
 };
 
