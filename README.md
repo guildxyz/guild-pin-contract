@@ -46,6 +46,15 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `ontology` (Ontology EVM Mainnet)
 - `linea` (Linea Mainnet)
 - `cyber` (Cyber Mainnet)
+- `taiko` (Taiko Mainnet)
+- `blast` (Blast)
+- `xlayer` (X Layer Mainnet)
+- `coredao` (Core Blockchain Mainnet)
+- `metis` (Metis Andromeda Mainnet)
+- `neon` (Neon EVM Mainnet)
+- `polygonzk` (Polygon zkEVM)
+- `scroll` (Scroll)
+- `zeta` (ZetaChain Mainnet)
 
 ## Verification
 
