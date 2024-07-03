@@ -55,6 +55,7 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `polygonzk` (Polygon zkEVM)
 - `scroll` (Scroll)
 - `zeta` (ZetaChain Mainnet)
+- `mint` (Mint Blockchain Mainnet)
 
 ## Verification
 
