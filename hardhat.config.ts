@@ -158,6 +158,11 @@ const config: HardhatUserConfig = {
       url: "https://rpc.mintchain.io",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    mode: {
+      url: "https://mode.drpc.org",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
@@ -186,9 +191,10 @@ const config: HardhatUserConfig = {
       metis: "metis",
       neon: "neon",
       polygonZkEVM: process.env.ZKEVM_POLYGONSCAN_API_KEY || "",
-      scroll: process.env.SCROLLSCAN_API_KEY || ""
+      scroll: process.env.SCROLLSCAN_API_KEY || "",
       // zeta: "", // no etherscan
       // mint: "", // no etherscan
+      mode: "mode"
     },
     customChains: [
       {
@@ -251,6 +257,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.scrollscan.com/api",
           browserURL: "https://scrollscan.com"
+        }
+      },
+      {
+        network: "mode",
+        chainId: 34443,
+        urls: {
+          apiURL: "https://api.routescan.io/v2/network/mainnet/evm/34443/etherscan",
+          browserURL: "https://modescan.io"
         }
       }
     ]
