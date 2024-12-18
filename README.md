@@ -59,6 +59,8 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `mode` (Mode Network Mainnet)
 - `avalanche` (Avalanche C-Chain)
 - `lisk` (Lisk Mainnet)
+- `form` (Form Mainnet)
+- `ink` (Ink Mainnet)
 
 ## Verification
 
