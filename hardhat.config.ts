@@ -320,8 +320,8 @@ const config: HardhatUserConfig = {
         network: "ink",
         chainId: 57073,
         urls: {
-          apiURL: "https://blockscout.inkonchain.com/api",
-          browserURL: "https://blockscout.inkonchain.com"
+          apiURL: "https://explorer.inkonchain.com/api",
+          browserURL: "https://explorer.inkonchain.com"
         }
       }
     ]
