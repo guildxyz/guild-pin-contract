@@ -78,6 +78,8 @@ Some block explorers might not support the verify plugin. In that case, use [har
 npx hardhat solidity-json
 ```
 
+The generated files will be under the [artifacts/solidity-json](./artifacts/solidity-json) folder, which you can typically submit on block explorers.
+
 ## Setup
 
 To set up the contract after initial deployment, you can use the _[setup-pin](scripts/setup-pin.ts)_ script. Set the parameters at the beginning of the script, then run it using the following command:
