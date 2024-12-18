@@ -5,6 +5,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@matterlabs/hardhat-zksync-verify";
 import "@nomicfoundation/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
+import "@xyrusworx/hardhat-solidity-json";
 import "dotenv/config";
 import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/config";
