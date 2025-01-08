@@ -61,6 +61,8 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `lisk` (Lisk Mainnet)
 - `form` (Form Mainnet)
 - `ink` (Ink Mainnet)
+- `iota` (IOTA EVM Mainnet)
+- `sonic` (Sonic Mainnet)
 
 ## Verification
 

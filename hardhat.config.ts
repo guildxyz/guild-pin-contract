@@ -184,6 +184,16 @@ const config: HardhatUserConfig = {
       url: "https://rpc-gel.inkonchain.com",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    iota: {
+      url: "https://json-rpc.evm.iotaledger.net",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
+    },
+    sonic: {
+      url: "https://rpc.soniclabs.com/",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
@@ -219,7 +229,9 @@ const config: HardhatUserConfig = {
       avalanche: "avalanche",
       lisk: "lisk",
       form: "form",
-      ink: "ink"
+      ink: "ink",
+      iota: "iota",
+      sonic: process.env.SONICSCAN_API_KEY || ""
     },
     customChains: [
       {
@@ -322,6 +334,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://explorer.inkonchain.com/api",
           browserURL: "https://explorer.inkonchain.com"
+        }
+      },
+      {
+        network: "iota",
+        chainId: 8822,
+        urls: {
+          apiURL: "https://explorer.evm.iota.org/api",
+          browserURL: "https://explorer.evm.iota.org"
+        }
+      },
+      {
+        network: "sonic",
+        chainId: 146,
+        urls: {
+          apiURL: "https://api.sonicscan.org/api",
+          browserURL: "https://sonicscan.org"
         }
       }
     ]
