@@ -201,7 +201,7 @@ const config: HardhatUserConfig = {
     zero: {
       url: "https://rpc.zerion.io/v1/zero",
       ethNetwork: "mainnet",
-      // verifyURL: "https://explorer-api.zero.network/verification/contract_verification",
+      verifyURL: "https://explorer-api.zero.network/verification/contract_verification",
       zksync: true
     }
   },
