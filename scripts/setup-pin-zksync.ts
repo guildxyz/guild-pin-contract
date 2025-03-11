@@ -5,7 +5,7 @@ import { Wallet } from "zksync-ethers";
 
 // CONFIG
 const pinAddress = "0x..."; // The address where the contract was deployed (proxy).
-const fee = "400000000000000"; // The amount of fees to collect from every minter.
+const fee = "750000000000000"; // The amount of fees to collect from every minter.
 
 enum GuildAction {
   JOINED_GUILD,
