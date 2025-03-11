@@ -109,7 +109,7 @@ const config: HardhatUserConfig = {
       zksync: false
     },
     cyber: {
-      url: "https://cyber.alt.technology",
+      url: "https://rpc.cyber.co",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
     },
