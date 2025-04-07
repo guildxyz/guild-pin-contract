@@ -208,6 +208,11 @@ const config: HardhatUserConfig = {
       url: "https://erpc.xinfin.network",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    soneium: {
+      url: "https://rpc.soneium.org",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
@@ -246,7 +251,8 @@ const config: HardhatUserConfig = {
       ink: "ink",
       iota: "iota",
       sonic: process.env.SONICSCAN_API_KEY || "",
-      xdc: process.env.XDCSCAN_API_KEY || ""
+      xdc: process.env.XDCSCAN_API_KEY || "",
+      soneium: "soneium"
     },
     customChains: [
       {
@@ -374,6 +380,11 @@ const config: HardhatUserConfig = {
           apiURL: "https://api.xdcscan.com/api",
           browserURL: "https://xdcscan.com"
         }
+      },
+      {
+        network: "soneium",
+        chainId: 1868,
+        urls: { apiURL: "https://soneium.blockscout.com/api", browserURL: "https://soneium.blockscout.com" }
       }
     ]
   },
