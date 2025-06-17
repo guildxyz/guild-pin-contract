@@ -213,6 +213,11 @@ const config: HardhatUserConfig = {
       url: "https://rpc.soneium.org",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    world: {
+      url: "https://worldchain-mainnet.g.alchemy.com/public",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
@@ -252,7 +257,8 @@ const config: HardhatUserConfig = {
       iota: "iota",
       sonic: process.env.SONICSCAN_API_KEY || "",
       xdc: process.env.XDCSCAN_API_KEY || "",
-      soneium: "soneium"
+      soneium: "soneium",
+      world: process.env.WORLDSCAN_API_KEY || ""
     },
     customChains: [
       {
@@ -385,6 +391,11 @@ const config: HardhatUserConfig = {
         network: "soneium",
         chainId: 1868,
         urls: { apiURL: "https://soneium.blockscout.com/api", browserURL: "https://soneium.blockscout.com" }
+      },
+      {
+        network: "world",
+        chainId: 10000,
+        urls: { apiURL: "https://api.worldscan.org/api", browserURL: "https://worldscan.org" }
       }
     ]
   },

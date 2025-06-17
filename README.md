@@ -66,6 +66,7 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `zero` (Zerion Zero Mainnet)
 - `xdc` (XDC Network Mainnet)
 - `soneium` (Soneium Mainnet)
+- `world` (World Chain Mainnet)
 
 ## Verification
 
