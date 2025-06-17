@@ -394,7 +394,7 @@ const config: HardhatUserConfig = {
       },
       {
         network: "world",
-        chainId: 10000,
+        chainId: 480,
         urls: { apiURL: "https://api.worldscan.org/api", browserURL: "https://worldscan.org" }
       }
     ]
