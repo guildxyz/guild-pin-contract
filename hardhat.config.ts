@@ -218,6 +218,11 @@ const config: HardhatUserConfig = {
       url: "https://worldchain-mainnet.g.alchemy.com/public",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       zksync: false
+    },
+    hemi: {
+      url: "https://hemi.drpc.org",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      zksync: false
     }
   },
   gasReporter: {
@@ -396,6 +401,11 @@ const config: HardhatUserConfig = {
         network: "world",
         chainId: 480,
         urls: { apiURL: "https://api.worldscan.org/api", browserURL: "https://worldscan.org" }
+      },
+      {
+        network: "hemi",
+        chainId: 43111,
+        urls: { apiURL: "https://explorer.hemi.xyz/api/v2", browserURL: "https://explorer.hemi.xyz/" }
       }
     ]
   },
