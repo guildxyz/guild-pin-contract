@@ -67,6 +67,7 @@ Networks can be configured in _[hardhat.config.ts](hardhat.config.ts)_. We've pr
 - `xdc` (XDC Network Mainnet)
 - `soneium` (Soneium Mainnet)
 - `world` (World Chain Mainnet)
+- `hemi` (Hemi)
 
 ## Verification
 
